@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.auth.security import hash_password
 from app.core.config import Settings
 from app.db.session import Base, engine
-from app.models.user import User, UserRole
+from app.models import User, UserRole
 
 
 def run_startup_self_check(settings: Settings) -> None:

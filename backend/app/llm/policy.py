@@ -3,7 +3,7 @@ from typing import Literal
 
 
 @dataclass
-class LLMDocumentPolicySubject:
+class OpenAIDocumentPolicySubject:
     source_track: Literal["track1_external", "track2_legacy", "track3_capture", "synthetic"]
     privilege_flag: bool = False
     pii_flags: list[str] = field(default_factory=list)
@@ -12,7 +12,7 @@ class LLMDocumentPolicySubject:
     )
 
 
-def can_send_to_external_llm(doc: LLMDocumentPolicySubject) -> tuple[bool, str | None]:
+def can_send_to_openai(doc: OpenAIDocumentPolicySubject) -> tuple[bool, str | None]:
     if doc.source_track == "track2_legacy":
         return False, "track2"
     if doc.privilege_flag:
@@ -22,3 +22,4 @@ def can_send_to_external_llm(doc: LLMDocumentPolicySubject) -> tuple[bool, str |
     if doc.visibility == "restricted_matter":
         return False, "restricted_matter"
     return True, None
+

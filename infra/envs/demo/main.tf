@@ -47,6 +47,7 @@ module "eks_cluster" {
   env        = var.env
   vpc_id     = module.network.vpc_id
   subnet_ids = module.network.private_subnet_ids
+  # Week 2 update: no GPU node group in PoC. OCR and embeddings use OpenAI adapters.
 }
 
 module "rds_postgres" {

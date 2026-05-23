@@ -41,7 +41,7 @@ resource "aws_security_group" "egress_allowlist" {
   vpc_id      = aws_vpc.this.id
 
   egress {
-    description = "HTTPS for OpenAI and Track 1 connector targets; FQDN enforcement is completed by AWS Network Firewall rules."
+    description = "HTTPS for OpenAI OCR/embeddings/LLM calls and Track 1 connector targets; FQDN enforcement is completed by AWS Network Firewall rules."
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"

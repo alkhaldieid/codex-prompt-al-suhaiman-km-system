@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-5"
     llm_fallback_model: str = "gpt-4.1"
     llm_timeout_ms: int = 30000
+    ocr_model: str = "gpt-5"
+    embeddings_model: str = "text-embedding-3-large"
+    embeddings_dimensions: int = 3072
 
 
 @lru_cache

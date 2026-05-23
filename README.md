@@ -25,11 +25,19 @@ Seed users:
 
 - Monorepo skeleton: `backend`, `frontend`, `infra`, `evals`.
 - FastAPI backend with health/startup self-checks, JWT auth, RBAC dependency, Arabic problem responses, and LLMClient abstraction.
-- PostgreSQL schema outline from the canonical data model, including audit and external LLM call tables.
+- PostgreSQL schema outline from the canonical data model, including audit and external OpenAI call tables.
 - Next.js Arabic-first RTL login and empty home dashboard shell.
 - Docker Compose development stack with Postgres, Redis, MinIO, OpenSearch, Vault dev, backend, and frontend.
 - Terraform demo environment module structure and scaffolded AWS me-central-2 configuration.
 - GitHub Actions CI scaffold with lint/test/security/AI-quality placeholders.
+
+## Week 2 Specification Update
+
+- OCR now goes through `OCRClient`; the PoC adapter is `OpenAIVisionOCRClient` using GPT-5 vision.
+- Embeddings now go through `EmbeddingsClient`; the PoC adapter is `OpenAIEmbeddingsClient` using `text-embedding-3-large` with 3072-dimensional vectors.
+- Terraform no longer assumes a GPU node group because BGE-M3 and the reranker are out of the PoC path.
+- Upload processing target is now a clear Arabic progress indicator with completion under 2 minutes.
+- The external OpenAI audit table covers `qa`, `autotag`, `summarize`, `embeddings`, and `ocr`.
 
 ## Week 1 Open Decisions / Assumptions to Surface
 

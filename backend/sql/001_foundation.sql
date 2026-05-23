@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS document_chunks (
   chunk_index INTEGER NOT NULL,
   text_ar TEXT NOT NULL,
   text_normalized TEXT NOT NULL,
-  embedding vector(1024),
+  embedding vector(3072),
   page_no INTEGER,
   paragraph_no INTEGER,
   char_start INTEGER,
@@ -86,15 +86,17 @@ CREATE TABLE IF NOT EXISTS audit_log (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE TABLE IF NOT EXISTS external_llm_calls (
+CREATE TABLE IF NOT EXISTS external_openai_calls (
   event_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  action TEXT NOT NULL DEFAULT 'external_llm_call',
+  action TEXT NOT NULL DEFAULT 'external_openai_call',
   model TEXT NOT NULL,
-  purpose TEXT NOT NULL,
+  purpose TEXT NOT NULL CHECK (purpose IN ('qa', 'autotag', 'summarize', 'embeddings', 'ocr')),
   doc_id UUID,
   doc_source_track source_track,
   input_tokens INTEGER NOT NULL DEFAULT 0,
   output_tokens INTEGER NOT NULL DEFAULT 0,
+  vector_count INTEGER NOT NULL DEFAULT 0,
+  page_count INTEGER NOT NULL DEFAULT 0,
   latency_ms INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
