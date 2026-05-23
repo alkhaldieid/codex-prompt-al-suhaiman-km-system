@@ -1,0 +1,2362 @@
+================================================================================
+CODEX PROMPT — AL-SUHAIMAN KM SYSTEM, ARABIC-FIRST LEGAL POC
+Spec version: 1.1 (consolidated)
+Prepared by: ETHKA
+Target build window: 4–6 week sprint
+================================================================================
+
+HOW TO USE THIS FILE
+--------------------
+Paste this entire file into Codex as the first message of a new project. The
+PROMPT section at the top tells Codex what to do; the SPECIFICATION section
+below it is the source of truth Codex must follow. Do not summarize or trim
+the spec when pasting — Codex needs the full text to avoid asking back.
+
+================================================================================
+PART 1 — PROMPT TO CODEX
+================================================================================
+
+You are Codex, the implementing engineer for the Al-Suhaiman Lawyers & Legal
+Consultants Arabic-first Knowledge Management proof-of-concept. ETHKA is the
+consultancy that has designed the system and wrote the specification below.
+Your job is to build the working PoC end-to-end against the spec.
+
+BUILD MANDATE
+-------------
+1. Implement the entire specification in PART 2 of this file as a working
+   system runnable end-to-end in a 4–6 week sprint, following the week-by-week
+   sequence in Section 16.
+
+2. The acceptance test is the demo scenario in Section 1.2. Your build is
+   "done" only when that scenario runs end-to-end on the demo environment,
+   meeting every pass criterion (T1–T7) listed there.
+
+3. The system is Arabic-first. Every UI string, error message, notification,
+   tooltip, audit log message, and email is authored in Arabic first; English
+   is a secondary fallback. RTL layout is the default. See Section 8 for the
+   UI specification — follow it literally for layout, fonts, dates, numerals,
+   and accessibility.
+
+4. The LLM for this PoC is OpenAI GPT-5 via api.openai.com, called only
+   through the LLMClient abstraction in Section 2.5/P2. The residency
+   exception in Section 10.7/P6 is binding — implement the technical controls
+   it requires (pre-flight check, audit log, NAT egress allowlist, startup
+   self-check, demo-env upload banner).
+
+5. Where the spec marks [DECISION NEEDED], do not invent an answer. Use the
+   default specified in that row and surface the decision in your week-1
+   status update. Where the spec says [ASSUMPTION], honor the assumption and
+   list it in your week-1 status update so ETHKA can validate.
+
+6. Production-grade is required even at PoC scale:
+   - All services dockerized, deployed via Terraform (Section 11.2).
+   - All endpoints idempotent where applicable; retries with backoff per
+     Section 2.4.
+   - Structured JSON logging with trace IDs, Prometheus metrics, OpenTelemetry
+     traces, the five Grafana dashboards in Section 13.4.
+   - The CI quality gates in Section 12.2 must be wired before any feature
+     ships. The AI-quality gate runs the 20-query benchmark in Section 7.5
+     and the 20-pair faithfulness eval; both must clear thresholds.
+
+7. Security posture per Section 10: JWT auth, RBAC, bcrypt, TLS 1.3, mTLS
+   between internal services, encryption at rest, full audit log, Vault for
+   secrets. No secrets in code or env files.
+
+8. Cost discipline: the OpenAI account has a $50/day soft cap and a $1,000
+   project hard cap (Section 17 D9). Run the full 20-query benchmark only on
+   merges to main and on a nightly schedule; per-PR runs use a 5-query smoke
+   test. Surface the llm_estimated_cost_usd_total metric in dashboards.
+
+WEEKLY CHECK-INS (REQUIRED)
+---------------------------
+At the end of each week, produce a status update containing:
+- What you built this week (linked to the week's milestone in Section 16).
+- Demo of the milestone — a recorded screen capture or runnable URL.
+- Open questions, blockers, and any [DECISION NEEDED] items you hit.
+- Spend-to-date on OpenAI tokens and projected infra cost.
+- Any deviations from the spec and the reason.
+
+ESCALATE TO ETHKA IMMEDIATELY IF
+--------------------------------
+- A real client document (not synthetic, not Track 1 public) appears in the
+  demo environment.
+- OpenAI's response patterns suggest the residency exception's
+  can_send_to_external_llm pre-flight is being bypassed.
+- The AI-quality CI gate is failing systematically and prompt iteration is
+  not closing the gap — this is a model-choice question, not yours to solve.
+- Cloud spend trajectory will exceed the budget in Section 11.6.
+- The Arabic UI is not rendering correctly on Chrome/Edge (font fallback,
+  RTL break, mixed-language line breaks) — get a native Arabic reviewer on
+  it before you ship the week.
+
+WHAT YOU DO NOT DO
+------------------
+- Do not implement anything in Section 18 ("What's deliberately not in the
+  PoC"). If a user request implies one of those features, refuse and link
+  back to Section 18.
+- Do not call any external API other than OpenAI (api.openai.com) and the
+  three Track 1 connector targets (BOE, SAMA, National Platform). The NAT
+  egress allowlist enforces this.
+- Do not write code that bypasses LLMClient for OpenAI calls. There is one
+  egress point and one only.
+- Do not store real PII, real privileged content, or real client matter data
+  in the demo environment. The technical pre-flight blocks it, but do not
+  build features that depend on having such content.
+- Do not commit OPENAI_API_KEY, JWT signing keys, or any other secret to git.
+  Vault is the only secret store.
+
+START HERE
+----------
+Acknowledge receipt, then begin Week 0 / Week 1 of Section 16. Your first
+deliverable is the working monorepo skeleton with Terraform for the demo env
+provisioned, the Postgres schema applied, the FastAPI auth flow working, and
+the Next.js login + empty Arabic home shell rendering in RTL.
+
+================================================================================
+PART 2 — SPECIFICATION (v1.1)
+================================================================================
+
+CLIENT:           Al-Suhaiman Lawyers & Legal Consultants (KSA)
+PREPARED BY:      ETHKA — Knowledge Management, Data & AI
+TARGET BUILD:     4–6 week Codex sprint
+DOCUMENT LANG:    English (engineering). Arabic strings embedded where they
+                  appear in the running system.
+
+--------------------------------------------------------------------------------
+SECTION 0 — EXECUTIVE SUMMARY (for partner reading)
+--------------------------------------------------------------------------------
+
+This document instructs Codex to build a working proof-of-concept of an
+Arabic-first legal knowledge system for Al-Suhaiman, runnable end-to-end in
+4–6 weeks. The PoC will demonstrate the following live: a lawyer drags an
+Arabic PDF court ruling onto a right-to-left web page; within thirty seconds
+the system has read the document with Arabic OCR, identified its practice
+area, document type, jurisdiction, parties and dates, and confirmed the
+metadata back to the lawyer for one-click acceptance. A second lawyer then
+searches in Arabic — typing a natural-language question — and finds the
+just-uploaded document among semantically-ranked precedents alongside
+recently-published regulations from at least two public Saudi sources
+(Bureau of Experts laws and a SAMA/CMA regulatory feed). The lawyer opens
+the document and asks a follow-up question in Arabic; the system answers in
+Arabic with citations pointing to specific passages in the original
+document. Everything runs inside a Saudi-resident cloud environment, with
+the firm's content stored as its property, encrypted and audited. The PoC
+is not the production system; it is built to prove that the Arabic-first
+design, the AI quality, and the end-to-end pipeline work, so that the pilot
+scope (Track 2 legacy migration, ethical walls, self-learning, multi-matter
+access controls) can be committed to with confidence.
+
+The PoC's LLM is OpenAI GPT-5, used under a documented residency exception
+scoped to public regulator content and synthetic firm content only. No real
+client matter, real PII, or real privileged content enters the PoC. The
+pilot phase swaps GPT-5 for a Saudi-Arabia-resident model and the full
+production residency posture takes effect.
+
+--------------------------------------------------------------------------------
+SECTION 1 — POC SCOPE AND SUCCESS CRITERIA
+--------------------------------------------------------------------------------
+
+1.1 STATED ASSUMPTIONS ABOUT AL-SUHAIMAN
+Each marked [ASSUMPTION] for post-PoC validation. Each has a fallback if the
+discovery answer differs.
+
+- [A1] Firm size: 30–60 fee earners plus 10–20 support staff. Affects:
+  concurrency targets, license counts in cost estimate.
+- [A2] Practice areas in PoC test corpus: Corporate & Commercial
+  (شركات وتجاري), Litigation & Dispute Resolution (تقاضي وتسوية نزاعات),
+  Banking & Finance (مصرفي ومالي), Real Estate (عقاري), Labor & Employment
+  (عمل), Regulatory & Compliance (تنظيمي وامتثال). Affects: taxonomy values,
+  test query set.
+- [A3] Working languages: Arabic primary, English mixed-in for cross-border
+  commercial work. Roughly 70/30 Arabic-to-English in document base.
+- [A4] Existing tooling: shared drives (OneDrive or Google Drive likely),
+  Outlook, no DMS, no current KM system. PoC does not attempt integrations.
+- [A5] User devices: Windows laptops, modern Chrome/Edge. Mobile is
+  read-only secondary. Desktop-first responsive UI.
+- [A6] Pilot auth source will be Microsoft Entra ID. PoC uses local
+  email/password with SSO upgrade path.
+- [A7] Arabic register in documents: MSA with classical legal phrasing;
+  Sharia-derived terms alongside codified-law terminology.
+- [A8] No existing PDPL data-processing register; ETHKA produces DPIA in
+  parallel (out of Codex scope).
+
+1.2 POC ACCEPTANCE TEST — SINGLE DEMO SCENARIO
+
+The build is done when this scenario runs end-to-end in front of partners:
+
+STEP 1 — UPLOAD. Lawyer A (lawyer.a@demo.suhaiman.sa) drags
+حكم_تجاري_2024_عينة.pdf (a scanned Arabic commercial-court ruling, ~8 pages,
+included in test fixtures) onto the upload area.
+
+STEP 2 — AUTO-PROCESSING. Within ≤30 seconds the metadata confirmation
+screen appears with these fields auto-populated, each with a confidence
+indicator:
+- نوع المستند (Document type): حكم قضائي (Judicial ruling)
+- مجال الممارسة (Practice area): تجاري (Commercial)
+- الجهة المصدرة (Issuing body): المحكمة التجارية بالرياض
+- التاريخ الهجري والميالدي: auto-extracted
+- الأطراف (Parties): two extracted entity names
+- الكلمات المفتاحية (Keywords): 5–8 Arabic terms
+
+STEP 3 — CONFIRMATION. Lawyer A clicks one button. Toast (Arabic):
+"تم الحفظ والفهرسة — جاهز للبحث". Document is now in Postgres canonical
+store and pgvector RAG store.
+
+STEP 4 — EXTERNAL FRESHNESS. Home screen left rail shows two cards under
+"آخر التحديثات التنظيمية", populated by Track 1 connectors within last
+hour: one Bureau of Experts (BOE), one SAMA or CMA.
+
+STEP 5 — SEARCH. Lawyer B (lawyer.b@demo.suhaiman.sa), separate browser,
+types in Arabic: "أحكام المحكمة التجارية بشأن فسخ العقود التجارية". Results
+return in ≤2 seconds, hybrid-ranked. The just-uploaded ruling appears in
+top 3 with a snippet showing the matching Arabic passage highlighted.
+
+STEP 6 — ASK THE DOCUMENT. Lawyer B opens the ruling, scrolls to the
+"اسأل عن هذا المستند" panel, types: "ما الأساس القانوني الذي اعتمدت عليه
+المحكمة في فسخ العقد؟". Within ≤8 seconds the system returns an Arabic
+answer of 3–6 sentences, with inline citations [¶3], [¶7] linking back to
+specific paragraphs. Clicking a citation jumps the reading pane and
+highlights it.
+
+STEP 7 — MIXED SEARCH. Lawyer B types mixed: "عقوبات SAMA على غسل الأموال".
+Results include both the Track 1 SAMA item and a synthetic English-language
+internal precedent, demonstrating mixed-language retrieval.
+
+PASS CRITERIA (measurable):
+- T1 latency (upload to "searchable"): ≤30s p50, ≤60s p95
+- T2 search latency: ≤2s p95
+- T3 RAG answer latency: ≤8s p95
+- T4 auto-tagging accuracy on 20-doc eval set: ≥80% practice-area correct,
+  ≥85% doc-type correct
+- T5 search retrieval quality on 15-query benchmark (§7.5):
+  Recall@10 ≥ 0.80, MRR ≥ 0.60
+- T6 RAG answer faithfulness: ≥90% cited passages actually contain the cited
+  claim (manual review of 20 Q&A pairs)
+- T7 Arabic UI: no English fallback strings visible on any demo screen;
+  RTL layout correct on all screens
+
+1.3 EXPLICITLY OUT OF SCOPE FOR POC
+
+Listed by name so Codex does not attempt them:
+- Full self-learning loops (LTR, classifier retraining, embedding refresh,
+  content lifecycle automation, synonym dictionary learning). PoC corpus too
+  small for signal. Picked up: pilot.
+- Track 2 legacy migration (firm shared drives, email vaults, scanned
+  archives). Requires firm IT access and PDPL clearance not in PoC scope.
+  Picked up: pilot, requirements doc delivered in parallel.
+- Multi-tenancy (one firm only). Picked up: productization post-pilot.
+- Mobile native apps. Picked up: pilot, responsive web only for PoC.
+- Ethical walls / matter-level access controls. Requires firm matter
+  taxonomy and conflicts data. Picked up: pilot.
+- Advanced workflows beyond the basic review queue (no parallel approvals,
+  no escalation, no quarterly refresh automation).
+- DMS integration, email-to-system live ingestion endpoint (API supports
+  it; no live mail server hookup).
+- Hijri calendar arithmetic beyond display conversion.
+- SSO, MFA, ethical wall enforcement, audit log review UI (logs are
+  written; no browse UI in PoC).
+- Phase 2 (LMS, competency framework, BI dashboards).
+
+--------------------------------------------------------------------------------
+SECTION 2 — SYSTEM ARCHITECTURE
+--------------------------------------------------------------------------------
+
+2.1 COMPONENT DIAGRAM (text form)
+
+                       +----------------------------------------+
+                       |  Next.js Frontend (RTL, Arabic-first)  |
+                       |  - Upload screen                       |
+                       |  - Search + results + doc viewer       |
+                       |  - Q&A panel                           |
+                       |  - Admin / review queue                |
+                       +-------------------+--------------------+
+                                           | HTTPS / JWT
+                                           v
+                       +----------------------------------------+
+                       |  FastAPI Gateway (Python 3.12)         |
+                       |  - Auth, RBAC                          |
+                       |  - Upload orchestration                |
+                       |  - Search orchestration                |
+                       |  - RAG orchestration                   |
+                       |  - Admin endpoints                     |
+                       +--+----------------+---------------+----+
+                          |                |               |
+              +-----------v--+    +--------v----+   +------v--------+
+              | Ingestion    |    | Search      |   | RAG / Q&A     |
+              | Workers      |    | Service     |   | Service       |
+              | (Celery)     |    |             |   |               |
+              +-+----+----+--+    +------+------+   +-+-------------+
+                |    |    |              |             |
+   +------------v+ +-v-+ +v-------+      |             |
+   | OCR         | |NLP| |Classif |      |             |
+   | (PaddleOCR) | |   | |  -ier  |      |             |
+   |             | |   | |        |      |             |
+   +------------++ ++-+ ++-------+       |             |
+                |   |    |               |             |
+                +---+----+---------------+-------------+
+                                     v             v
+                       +----------------------------------------+
+                       |  Storage layer (all KSA region)         |
+                       |  - S3-compatible object store           |
+                       |    (originals + OCR text + thumbs)      |
+                       |  - PostgreSQL 16 + pgvector             |
+                       |    (canonical docs + vectors)           |
+                       |  - OpenSearch 2.x                       |
+                       |    (Arabic analyzer, BM25)              |
+                       |  - Redis (queue + cache)                |
+                       +----------------------------------------+
+                                          ^
+                                          |
+                       +------------------+---------------------+
+                       |  Track 1 Connectors (Celery Beat)       |
+                       |  - BOE laws connector                   |
+                       |  - SAMA announcements connector         |
+                       |  - MOJ / National Platform aggregator   |
+                       +----------------------------------------+
+
+                       +----------------------------------------+
+                       |  AI Layer                               |
+                       |  - Embeddings: BGE-M3 (self-hosted KSA) |
+                       |  - LLM: OpenAI GPT-5 via LLMClient      |
+                       |    (external; under §10.7 exception)    |
+                       |  - Arabic NER: CAMeL-Tools MSA NER      |
+                       +----------------------------------------+
+
+                       +----------------------------------------+
+                       |  Cross-cutting                          |
+                       |  - OpenTelemetry -> Tempo/Jaeger        |
+                       |  - Prometheus + Grafana                 |
+                       |  - Loki (logs)                          |
+                       |  - Vault (secrets)                      |
+                       +----------------------------------------+
+
+2.2 DATA FLOW — UPLOAD TO RETRIEVAL
+
+1. Browser POSTs multipart upload to /api/v1/documents (FastAPI).
+2. FastAPI streams file to S3-compatible object store, key
+   raw/{doc_id}/{filename}. Returns 202 Accepted with doc_id and a
+   status-stream URL.
+3. FastAPI enqueues ingest.process job on Celery (Redis broker).
+4. Ingestion worker, in order:
+   a. Pull file from object store.
+   b. Detect MIME / extension. If PDF: try text extraction with
+      pdfplumber. If empty / image-only PDF -> OCR.
+   c. OCR: PaddleOCR PP-OCRv5 with Arabic model. Output: per-page text,
+      per-page bounding boxes, mean confidence. Store OCR JSON at
+      processed/{doc_id}/ocr.json.
+   d. Language detection: fasttext lid.176, segment-level. Tag mixed
+      documents with primary + secondary language proportions.
+   e. Text normalization: Arabic-specific normalizer (alef variants -> ا,
+      ta marbuta handling, tatweel removal, diacritics stripped to a
+      separate text_normalized field while text_raw is preserved).
+   f. Chunking: paragraph-aware, see §6.1.
+   g. NER + classification: parties (CAMeL-Tools NER), dates (regex +
+      dateparser for Hijri/Gregorian), document type and practice area
+      (zero-shot LLM prompt via LLMClient, see §7.2), jurisdiction (regex
+      + LLM fallback), keywords (KeyBERT with Arabic embeddings).
+   h. PII / privilege flags: regex detectors for Saudi national ID
+      (10-digit starting with 1 or 2), Iqama, IBAN, phone, email, and a
+      privilege-keyword Arabic list (e.g. "سري ومحمي"، "محام-موكل").
+      Flags routed to review.
+   i. Dedupe: SHA-256 of normalized text; if hash matches existing doc
+      -> mark as duplicate, no re-index.
+   j. Embeddings: BGE-M3 dense vectors per chunk, written to pgvector.
+   k. Indexing: write canonical record to PostgreSQL (documents +
+      document_chunks + document_metadata); write BM25-indexable fields
+      to OpenSearch with Arabic analyzer; update status to
+      pending_review if quality-gate triggers, else published.
+   l. Emit document.ready event with doc_id; UI polls status endpoint or
+      receives via SSE.
+5. Retrieval (search): FastAPI /api/v1/search -> query analyzer (Arabic
+   normalization + stemming) -> parallel BM25 (OpenSearch) + dense
+   (pgvector cosine) -> Reciprocal Rank Fusion (RRF, k=60) -> optional
+   reranker (bge-reranker-v2-m3 on top 50) -> top 10 with snippets.
+6. RAG Q&A: /api/v1/documents/{doc_id}/ask -> retrieve top-k chunks from
+   that document (or scoped corpus) -> pre-flight can_send_to_external_llm
+   check (§10.7) -> assemble prompt -> LLMClient.complete (GPT-5) ->
+   parse cited passages -> return answer + citation map.
+
+2.3 TECH STACK PER LAYER
+
+Each row: chosen / one alternative / rationale.
+
+| Layer | Chosen | Alternative | Rationale |
+|---|---|---|---|
+| Frontend | Next.js 14 (App Router) + React 18 + TypeScript + Tailwind + shadcn/ui | Remix or plain Vite + React | Next.js has best-in-class RTL handling via dir attribute on html, mature i18n via next-intl, server components reduce client JS for slow networks. Tailwind has rtl: variants. |
+| RTL/i18n | next-intl + dir="rtl" + logical CSS properties (margin-inline-start, etc.) | react-intl | next-intl integrates with App Router, supports message pluralization for Arabic's six plural forms. |
+| Arabic font | IBM Plex Sans Arabic (UI) + Noto Naskh Arabic (document reading) | Tajawal (UI) + Amiri (reading) | IBM Plex Sans Arabic renders modern UI cleanly; Noto Naskh Arabic is de facto standard for legal/classical Arabic body text. Both open source, available via Google Fonts, render diacritics correctly. |
+| API gateway | FastAPI on Python 3.12 | NestJS / Node | FastAPI matches Python's strength in NLP and the rest of the AI stack. |
+| Auth (PoC) | email/password + bcrypt + JWT (RS256), refresh token rotation | Auth0 / Cognito | Self-hosted for PoC simplicity and in-region constraint. Upgrade path: replace JWT issuer with Entra ID OIDC. |
+| Object store | MinIO (self-hosted, S3-compatible) running in KSA | AWS S3 in me-central-2 once GA | AWS Saudi Arabia Region (me-central-2) reached GA in January 2026 — S3 in-region feasible. MinIO chosen for PoC because it's free, runs in any KSA-resident environment, and avoids vendor lock-in until production hosting decision is made. |
+| Structured DB | PostgreSQL 16 with ar-x-icu ICU collation | MySQL 8 | Postgres has mature ICU collation for Arabic sorting, JSONB for flexible metadata, natural host for pgvector. |
+| Vector store | pgvector 0.7+ (HNSW index, cosine) on same Postgres instance | Qdrant or Weaviate | PoC corpus will be ≤10k documents, ≤500k chunks — within pgvector's strong envelope. Separate vector DB introduces operational overhead PoC does not need. Migration to Qdrant deferred to pilot if corpus exceeds ~2M chunks. |
+| Lexical search | OpenSearch 2.13+ with arabic analyzer + custom synonym filter | Elasticsearch (license) / Vespa | OpenSearch ships Lucene Arabic analyzer (ArabicNormalizer + light ArabicStemmer), Apache 2.0, commodity infrastructure. |
+| OCR | PaddleOCR PP-OCRv5 (Arabic model) self-hosted on GPU | Tesseract 5 with ara traineddata; or Azure Document Intelligence (only if KSA region available) | PaddleOCR significantly outperforms Tesseract on multilingual documents and complex layouts. Tesseract Arabic is open-source fallback; expect 10–20% lower accuracy on scanned legal documents. Cloud OCR (Azure DI) deferred until KSA-region confirmed. |
+| Embeddings | BGE-M3 (BAAI), self-hosted on GPU in KSA | multilingual-e5-large; silma-embeddings-matryoshka | BGE-M3 leads Arabic RAG benchmarks (RAGAS ~71 vs ~70.3 for e5-large), supports 8192-token context (vital for legal paragraphs), outputs dense + sparse + multi-vector from one model for native hybrid retrieval. Apache 2.0, self-hostable. |
+| Reranker | bge-reranker-v2-m3 (same family) | Cohere Rerank (not in-region) | Optional in PoC; enabled if latency budget permits. |
+| LLM | OpenAI GPT-5 via api.openai.com, called through LLMClient abstraction | GPT-4.1 (env-flag fallback); ALLaM-7B (pilot sovereignty fallback) | Strongest Arabic legal reasoning available. Operates under §10.7 residency exception. LLMClient abstraction enables one-line swap to KSA-resident model at pilot. |
+| Arabic NER | CAMeL-Tools 1.5+ (NYU Abu Dhabi) MSA NER model | spaCy with Arabic model; LLM-as-NER | Most mature Arabic NLP toolkit, MSA NER trained on ACE/ANERcorp, MIT license. |
+| Queue / cache | Redis 7 | RabbitMQ | Covers jobs and cache in one component. |
+| Workers | Celery 5 | Arq, RQ | Mature, well-documented, observability hooks. |
+| Containerization | Docker + Docker Compose for dev; Kubernetes (EKS) for demo | Plain VMs | Compose for local dev, K8s for demo to validate pilot deployment pattern. |
+| IaC | Terraform 1.7+ | Pulumi | Industry default for KSA-region deployments. |
+| CI/CD | GitHub Actions | GitLab CI | Assumes source repo in GitHub. |
+| Observability | OpenTelemetry SDK; Prometheus; Grafana; Tempo (traces); Loki (logs) | Datadog (cost / residency) | Self-hosted OTel stack keeps all telemetry in KSA. |
+| Secrets | HashiCorp Vault (self-hosted) | AWS Secrets Manager (once me-central-2 services confirmed) | Portable across clouds. |
+
+2.4 CROSS-CUTTING PRODUCTION CONCERNS (every component)
+
+- Observability: every HTTP and worker handler emits a structured JSON log
+  with trace_id, span_id, user_id (when present), doc_id (when relevant),
+  latency_ms, outcome. Every external call (LLM, OCR, OpenSearch) wrapped
+  in an OTel span. Metrics: request rate, error rate, latency histogram
+  per endpoint; queue depth and worker saturation; OCR confidence
+  distribution; LLM token usage and cost.
+- Error handling: all worker tasks idempotent (keyed by doc_id +
+  pipeline_step). Retries on transient errors with exponential backoff
+  (base 2s, max 5 retries, max delay 120s). Dead-letter queue for
+  permanent failures, surfaced in admin UI.
+- Idempotency: upload endpoint accepts Idempotency-Key header; duplicate
+  upload of same content (SHA-256) returns existing doc_id with 201 and
+  X-Idempotent-Replay: true.
+- Security: TLS 1.3 everywhere; mTLS between FastAPI and workers in K8s;
+  at-rest encryption via storage-layer (Postgres TDE or LUKS, MinIO
+  SSE-S3, EBS-equivalent); secrets via Vault; JWT signing key rotated
+  quarterly; per-tenant keys deferred to pilot.
+- Rate limiting: per-user (100 req/min on search, 30 req/min on uploads,
+  20 req/min on Q&A) via Redis token bucket.
+
+2.5 LLM CLIENT ABSTRACTION
+
+Codex implements one interface; PoC ships one adapter; pilot adds a second.
+
+```python
+# backend/app/llm/base.py
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import AsyncIterator, Literal
+
+@dataclass
+class LLMMessage:
+    role: Literal["system", "user", "assistant"]
+    content: str
+
+@dataclass
+class LLMResponse:
+    text: str
+    model: str
+    input_tokens: int
+    output_tokens: int
+    finish_reason: str
+    latency_ms: int
+    raw: dict  # for audit/debug
+
+class LLMClient(ABC):
+    @abstractmethod
+    async def complete(
+        self,
+        messages: list[LLMMessage],
+        *,
+        max_output_tokens: int = 1500,
+        temperature: float = 0.2,
+        response_format: Literal["text", "json_object"] = "text",
+        timeout_s: int = 30,
+        request_id: str | None = None,
+    ) -> LLMResponse: ...
+
+    @abstractmethod
+    async def stream(
+        self,
+        messages: list[LLMMessage],
+        *,
+        max_output_tokens: int = 1500,
+        temperature: float = 0.2,
+        timeout_s: int = 60,
+        request_id: str | None = None,
+    ) -> AsyncIterator[str]: ...
+```
+
+POC ADAPTER: OpenAIChatGPTClient wraps openai Python SDK against
+api.openai.com. Reads OPENAI_API_KEY from Vault. Reads model name from
+LLM_MODEL env var, default "gpt-5". Reads LLM_FALLBACK_MODEL, default
+"gpt-4.1". Reads LLM_TIMEOUT_MS, default 30000.
+
+PILOT ADAPTER (stub in repo, not active): KSAResidentLLMClient placeholder
+file with NotImplementedError so the contract is visible.
+
+--------------------------------------------------------------------------------
+SECTION 3 — DATA MODEL
+--------------------------------------------------------------------------------
+
+3.1 CANONICAL DOCUMENT JSON SCHEMA
+
+Authoritative schema. Codex generates SQL DDL, Pydantic models, and OpenAPI
+components from this.
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ethka.dev/schemas/suhaiman-document-v1.json",
+  "title": "Document",
+  "type": "object",
+  "required": [
+    "doc_id", "title_ar", "doc_type", "practice_area",
+    "jurisdiction", "language", "created_at", "source_track",
+    "visibility", "status"
+  ],
+  "properties": {
+    "doc_id": {
+      "type": "string", "format": "uuid",
+      "ui_label_ar": "معرّف المستند", "ui_label_en": "Document ID"
+    },
+    "title_ar": {
+      "type": "string", "minLength": 3, "maxLength": 500,
+      "ui_label_ar": "العنوان (عربي)", "ui_label_en": "Title (Arabic)"
+    },
+    "title_en": {
+      "type": ["string", "null"], "maxLength": 500,
+      "ui_label_ar": "العنوان (إنجليزي)", "ui_label_en": "Title (English)"
+    },
+    "doc_type": {
+      "type": "string",
+      "enum": [
+        "judicial_ruling", "legal_opinion", "memo", "pleading",
+        "contract", "engagement_letter", "regulation", "royal_decree",
+        "council_resolution", "circular", "template", "precedent_note",
+        "other"
+      ],
+      "ui_label_ar": "نوع المستند", "ui_label_en": "Document type",
+      "x-arabic-display": {
+        "judicial_ruling": "حكم قضائي",
+        "legal_opinion": "رأي قانوني",
+        "memo": "مذكرة",
+        "pleading": "لائحة",
+        "contract": "عقد",
+        "engagement_letter": "خطاب ارتباط",
+        "regulation": "لائحة تنظيمية",
+        "royal_decree": "مرسوم ملكي",
+        "council_resolution": "قرار مجلس الوزراء",
+        "circular": "تعميم",
+        "template": "نموذج",
+        "precedent_note": "مذكرة سابقة",
+        "other": "أخرى"
+      }
+    },
+    "practice_area": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "corporate_commercial", "litigation_dispute",
+          "banking_finance", "real_estate", "labor_employment",
+          "regulatory_compliance", "ip", "tax_zakat",
+          "construction", "family_inheritance", "criminal",
+          "administrative"
+        ]
+      },
+      "minItems": 1,
+      "ui_label_ar": "مجال الممارسة", "ui_label_en": "Practice area",
+      "x-arabic-display": {
+        "corporate_commercial": "شركات وتجاري",
+        "litigation_dispute": "تقاضي وتسوية نزاعات",
+        "banking_finance": "مصرفي ومالي",
+        "real_estate": "عقاري",
+        "labor_employment": "عمل",
+        "regulatory_compliance": "تنظيمي وامتثال",
+        "ip": "ملكية فكرية",
+        "tax_zakat": "ضريبي وزكوي",
+        "construction": "تشييد ومقاولات",
+        "family_inheritance": "أحوال شخصية وميراث",
+        "criminal": "جزائي",
+        "administrative": "إداري"
+      }
+    },
+    "jurisdiction": {
+      "type": "string",
+      "enum": ["KSA", "GCC_BH", "GCC_KW", "GCC_OM", "GCC_QA", "GCC_AE",
+               "DIFC", "ADGM", "INTL", "OTHER"],
+      "ui_label_ar": "الاختصاص القضائي", "ui_label_en": "Jurisdiction"
+    },
+    "issuing_body_ar": {
+      "type": ["string", "null"],
+      "ui_label_ar": "الجهة المصدرة", "ui_label_en": "Issuing body"
+    },
+    "issuing_body_en": { "type": ["string", "null"] },
+    "parties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name_ar": {"type": "string"},
+          "name_en": {"type": ["string", "null"]},
+          "role": {"type": "string",
+                   "enum": ["claimant", "defendant", "appellant",
+                            "appellee", "party_a", "party_b",
+                            "third_party", "other"]}
+        }
+      },
+      "ui_label_ar": "الأطراف", "ui_label_en": "Parties"
+    },
+    "date_gregorian": {
+      "type": ["string", "null"], "format": "date",
+      "ui_label_ar": "التاريخ الميلادي", "ui_label_en": "Gregorian date"
+    },
+    "date_hijri": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "ui_label_ar": "التاريخ الهجري", "ui_label_en": "Hijri date"
+    },
+    "case_number": { "type": ["string", "null"] },
+    "language": {
+      "type": "object",
+      "properties": {
+        "primary": {"type": "string", "enum": ["ar", "en", "mixed"]},
+        "ar_ratio": {"type": "number", "minimum": 0, "maximum": 1},
+        "en_ratio": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "keywords_ar": {
+      "type": "array", "items": {"type": "string"}, "maxItems": 20
+    },
+    "source_track": {
+      "type": "string",
+      "enum": ["track1_external", "track2_legacy", "track3_capture",
+               "synthetic"],
+      "ui_label_ar": "مصدر المحتوى", "ui_label_en": "Content source"
+    },
+    "source_url": { "type": ["string", "null"], "format": "uri" },
+    "source_connector_id": { "type": ["string", "null"] },
+    "visibility": {
+      "type": "string",
+      "enum": ["firm_wide", "practice_area_only",
+               "restricted_matter", "owner_only"],
+      "default": "firm_wide",
+      "ui_label_ar": "نطاق الإطلاع", "ui_label_en": "Visibility"
+    },
+    "privilege_flag": {
+      "type": "boolean", "default": false,
+      "description": "Attorney-client privilege detected; routes through review"
+    },
+    "pii_flags": {
+      "type": "array",
+      "items": {"type": "string",
+                "enum": ["national_id", "iqama", "iban",
+                         "phone", "email", "passport"]}
+    },
+    "status": {
+      "type": "string",
+      "enum": ["uploaded", "processing", "pending_review",
+               "published", "archived", "rejected", "duplicate_of"],
+      "default": "uploaded"
+    },
+    "duplicate_of_doc_id": { "type": ["string", "null"], "format": "uuid" },
+    "content_hash_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "ocr_metadata": {
+      "type": ["object", "null"],
+      "properties": {
+        "engine": {"type": "string"},
+        "engine_version": {"type": "string"},
+        "mean_confidence": {"type": "number"},
+        "pages": {"type": "integer"}
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "created_by": { "type": ["string", "null"], "format": "uuid" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "version": { "type": "integer", "minimum": 1, "default": 1 },
+    "audit_log_ref": { "type": "string" }
+  },
+  "additionalProperties": false
+}
+```
+
+3.2 POSTGRESQL DDL OUTLINE (Codex generates final)
+
+Tables:
+- documents — one row per canonical document, all top-level JSON Schema
+  fields as columns (title_ar TEXT COLLATE "ar-x-icu", doc_type
+  doc_type_enum, practice_area practice_area_enum[], etc.).
+- document_chunks — chunk_id, doc_id, chunk_index, text_ar,
+  text_normalized, embedding VECTOR(1024), page_no, paragraph_no,
+  char_start, char_end. HNSW index on embedding.
+- document_parties — normalized party table (party_id, doc_id, name_ar,
+  name_en, role).
+- users — user_id, email, password_hash, display_name_ar, display_name_en,
+  role, created_at.
+- roles_permissions — RBAC matrix.
+- audit_log — event_id, actor_user_id, action, target_type, target_id,
+  details JSONB, created_at.
+- external_llm_calls — separate audit log for §10.7 (action,
+  external_llm_call). Schema in §10.7.
+- connector_runs — run_id, connector_id, started_at, finished_at, status,
+  items_fetched, items_new, error_message.
+- feedback_signals — placeholder for pilot; created in PoC, write-only,
+  not consumed by learning (per scope).
+
+All tables: created_at, updated_at triggers; row-level security policies
+stubbed (no enforcement in PoC — flagged).
+
+3.3 EXAMPLE FULLY-TAGGED DOCUMENTS (test fixtures)
+
+Three documents Codex includes in seed data.
+
+FIXTURE D1 — Commercial court ruling (uploaded via Track 3):
+
+```json
+{
+  "doc_id": "00000000-0000-0000-0000-000000000001",
+  "title_ar": "حكم المحكمة التجارية بالرياض في القضية رقم 4521/1445 بشأن فسخ عقد توريد",
+  "title_en": "Riyadh Commercial Court ruling in case 4521/1445 on rescission of a supply contract",
+  "doc_type": "judicial_ruling",
+  "practice_area": ["corporate_commercial", "litigation_dispute"],
+  "jurisdiction": "KSA",
+  "issuing_body_ar": "المحكمة التجارية بالرياض",
+  "issuing_body_en": "Riyadh Commercial Court",
+  "parties": [
+    {"name_ar": "شركة الفجر للتوريدات", "name_en": "Al-Fajr Supplies Co.", "role": "claimant"},
+    {"name_ar": "مؤسسة النخبة للمقاولات", "name_en": "Al-Nokhba Contracting Est.", "role": "defendant"}
+  ],
+  "date_gregorian": "2024-03-12",
+  "date_hijri": "1445-09-02",
+  "case_number": "4521/1445",
+  "language": {"primary": "ar", "ar_ratio": 0.97, "en_ratio": 0.03},
+  "keywords_ar": ["فسخ عقد", "توريد", "إخلال جوهري", "تعويض", "نظام المعاملات المدنية"],
+  "source_track": "track3_capture",
+  "visibility": "firm_wide",
+  "privilege_flag": false,
+  "status": "published"
+}
+```
+
+FIXTURE D2 — BOE law/regulation (Track 1):
+
+```json
+{
+  "doc_id": "00000000-0000-0000-0000-000000000002",
+  "title_ar": "نظام المعاملات المدنية الصادر بالمرسوم الملكي رقم (م/١٩١) بتاريخ ١٤٤٤/١١/٢٩هـ",
+  "title_en": "Civil Transactions Law issued by Royal Decree No. (M/191) dated 29/11/1444H",
+  "doc_type": "regulation",
+  "practice_area": ["corporate_commercial", "real_estate", "litigation_dispute"],
+  "jurisdiction": "KSA",
+  "issuing_body_ar": "ديوان رئاسة مجلس الوزراء — هيئة الخبراء",
+  "issuing_body_en": "Bureau of Experts at the Council of Ministers",
+  "date_gregorian": "2023-06-19",
+  "date_hijri": "1444-11-29",
+  "language": {"primary": "ar", "ar_ratio": 1.0, "en_ratio": 0.0},
+  "keywords_ar": ["معاملات مدنية", "عقود", "التزامات", "مرسوم ملكي"],
+  "source_track": "track1_external",
+  "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/...",
+  "source_connector_id": "boe_laws_v1",
+  "visibility": "firm_wide",
+  "status": "published"
+}
+```
+
+FIXTURE D3 — Internal legal opinion (synthetic, mixed-language):
+
+```json
+{
+  "doc_id": "00000000-0000-0000-0000-000000000003",
+  "title_ar": "رأي قانوني حول التزامات المؤسسات المالية تجاه أنظمة مكافحة غسل الأموال — لائحة ساما",
+  "title_en": "Legal opinion on financial institutions' AML obligations under SAMA regulations",
+  "doc_type": "legal_opinion",
+  "practice_area": ["banking_finance", "regulatory_compliance"],
+  "jurisdiction": "KSA",
+  "parties": [{"name_ar": "بنك تجاري (عميل)", "name_en": "Commercial bank (client)", "role": "party_a"}],
+  "date_gregorian": "2024-11-04",
+  "language": {"primary": "mixed", "ar_ratio": 0.65, "en_ratio": 0.35},
+  "keywords_ar": ["غسل الأموال", "ساما", "العناية الواجبة", "الإبلاغ عن المعاملات المشبوهة"],
+  "source_track": "synthetic",
+  "visibility": "practice_area_only",
+  "privilege_flag": true,
+  "pii_flags": [],
+  "status": "published"
+}
+```
+
+3.4 SOURCE-TO-CANONICAL FIELD MAPPING
+
+| Source | Source field | Canonical field | Transform |
+|---|---|---|---|
+| BOE laws | Title | title_ar | trim, normalize Arabic |
+| BOE laws | Decree number | case_number (reused) | parse م/N pattern |
+| BOE laws | Hijri date | date_hijri | normalize to YYYY-MM-DD |
+| BOE laws | Volume + Section | practice_area[] | lookup table (BOE 7 volumes -> practice_area enum) |
+| SAMA RSS | title | title_ar | |
+| SAMA RSS | pubDate | date_gregorian | RFC822 -> ISO8601 |
+| SAMA RSS | link | source_url | |
+| User upload | filename | title_ar (initial guess; user edits) | strip extension |
+| User upload | OCR text | document_chunks.text_ar | per §6.1 chunking |
+
+--------------------------------------------------------------------------------
+SECTION 4 — TRACK 1 EXTERNAL CONTENT CONNECTORS
+--------------------------------------------------------------------------------
+
+Codex implements three connectors for the PoC. Each is a Celery Beat
+scheduled task plus a fetcher class; all three share BaseConnector.
+
+4.1 COMMON CONNECTOR CONTRACT
+
+```python
+class BaseConnector(ABC):
+    connector_id: str          # e.g. "boe_laws_v1"
+    schedule_cron: str         # e.g. "0 */6 * * *"
+    user_agent: str            # "ETHKA-Suhaiman-KM/1.0 (+legal@ethka.dev)"
+    rate_limit_rpm: int        # requests per minute
+    timeout_seconds: int       # default 30
+
+    @abstractmethod
+    def list_items(self, since: datetime) -> Iterator[ConnectorItem]: ...
+
+    @abstractmethod
+    def fetch_item(self, item: ConnectorItem) -> RawContent: ...
+
+    @abstractmethod
+    def parse(self, raw: RawContent) -> CanonicalDocumentDraft: ...
+
+    # Common helpers (in BaseConnector):
+    # - session with retry/backoff (urllib3 Retry: 5 attempts, backoff 2^n,
+    #   status_forcelist=[429, 500, 502, 503, 504])
+    # - robots.txt check via reppy on startup; refuses to run if disallowed
+    # - rate-limit token bucket (Redis-backed)
+    # - identification header always sent
+    # - Arabic charset detection: assume UTF-8; if bytes invalid, try cp1256;
+    #   emit metric connector.encoding_fallback
+    # - schema-drift detection: hash of source field-set per item; alert if
+    #   hash changes
+    # - kill switch: Redis key connector:{id}:enabled checked every iteration
+    # - idempotency: dedupe by source_url + content hash before persisting
+    # - observability: span per item, log connector_id/item_id/outcome/duration
+```
+
+4.2 CONNECTOR C1 — BUREAU OF EXPERTS (BOE) LAWS
+
+Source: Bureau of Experts at the Council of Ministers — official Saudi
+laws and regulations database. Public laws linkable via pattern
+https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/{guid} as used in
+published Saudi legal references.
+
+Access method: structured scraping of the public laws portal (no official
+open API as of 2026). Server-rendered HTML, content in Arabic UTF-8.
+
+Legal posture paragraph: BOE is a Saudi government body publishing the
+law of the land. Saudi laws and regulations are not subject to copyright
+in the same manner as private works; reproduction and republication for
+legitimate research and professional use by licensed law firms is the
+established norm in the Saudi legal market. The connector identifies
+itself in the User-Agent, respects robots.txt, limits request rate (≤6
+rpm), fetches only published-law pages (not transactional services), and
+stores the source URL so users can return to the official source. If BOE
+publishes an official API during pilot, the connector switches to that.
+
+Endpoint pattern:
+- List: https://laws.boe.gov.sa/BoeLaws/Laws/Search?lang=ar&sortby=DateOfIssue&sortdir=desc&page={n}
+- Detail: https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/{guid}?lang=ar
+- Translation (if available): ?lang=en
+
+Auth: none (public).
+Rate limit: 6 rpm, 1 concurrent request.
+
+Headers:
+  User-Agent: ETHKA-Suhaiman-KM/1.0 (+legal@ethka.dev)
+  Accept: text/html,application/xhtml+xml
+  Accept-Language: ar,en;q=0.5
+  From: legal@ethka.dev
+
+Request flow:
+1. Fetch list page 1, parse, find newest item dates.
+2. If newest dates >= last_seen_date, walk pages 1..N until items older
+   than last_seen_date.
+3. For each new GUID, fetch detail page in Arabic and English (if
+   available).
+4. Parse with BeautifulSoup; extract title, decree number, Hijri date,
+   body text, attachments (PDFs).
+5. Download attachments to object store.
+6. Build CanonicalDocumentDraft, emit to ingestion queue.
+
+Response schema (parsed):
+```json
+{
+  "guid": "25df73d6-0f49-4dc5-b01...",
+  "title_ar": "...",
+  "title_en": "...",
+  "decree_number": "م/191",
+  "date_hijri": "1444-11-29",
+  "date_gregorian_inferred": "2023-06-19",
+  "volume": "Commerce, Economy, and Investment Laws",
+  "body_ar": "<full text>",
+  "body_en": "<full text or null>",
+  "attachments": [{"url": "...", "filename": "..."}]
+}
+```
+
+Schema drift: maintain field_set_hash per item; on mismatch raise alert
+connector.schema_drift and quarantine the item.
+
+Retry policy: 5 retries, exponential backoff 2^n seconds, status_forcelist
+[429, 500, 502, 503, 504]. 429 waits Retry-After header.
+
+Idempotency: key = SHA-256 of (connector_id, guid, content_hash).
+Re-fetch always allowed; persist skipped if key exists.
+
+Observability:
+- Metric connector.boe_laws.items_fetched_total{outcome=success|new|duplicate|error}
+- Metric connector.boe_laws.last_success_timestamp
+- Log fields: connector_id, guid, outcome, duration_ms, bytes
+- Alert: no successful run in 24h -> page on-call.
+
+Kill switch: Redis key connector:boe_laws_v1:enabled = false halts next
+scheduled run within ≤1 minute.
+
+Acceptance criteria:
+- AC-C1.1: connector runs every 6 hours, fetches at least 1 new item
+  within first 48 hours.
+- AC-C1.2: parsed item contains non-empty title_ar, body_ar, date_hijri,
+  decree_number.
+- AC-C1.3: Arabic encoding correct (UTF-8) — automated test asserts random
+  sample contains valid Arabic characters and no mojibake.
+- AC-C1.4: graceful handling of 404 on stale GUID (skip, log, continue).
+- AC-C1.5: robots.txt re-check at startup; refuses to operate if
+  disallowed.
+
+4.3 CONNECTOR C2 — SAMA ANNOUNCEMENTS
+
+Source: Saudi Central Bank (SAMA) — circulars, rules, news. Public RSS if
+available, else HTML index page.
+
+Access method: [DECISION NEEDED — D2] — Codex verifies during week 1
+whether SAMA publishes an RSS or Atom feed. If RSS exists, use it. If
+not, structured HTML scrape of
+https://www.sama.gov.sa/en-US/News/Pages/default.aspx and Arabic mirror.
+Default plan: HTML scrape.
+
+Legal posture: SAMA is the financial regulator; announcements, circulars,
+rules are public statutory instruments. Same posture as BOE.
+
+Rate limit: 6 rpm.
+Headers: same identification headers as C1.
+
+Endpoint pattern:
+- Arabic announcements index:
+  https://www.sama.gov.sa/ar-sa/News/Pages/default.aspx
+- Each announcement: detail page URL extracted from index.
+
+Parsing: title (h1), publication date, body text, linked PDFs
+(downloaded to object store), category tag.
+
+Mapping: practice_area defaulted to ["banking_finance",
+"regulatory_compliance"]; doc_type defaults to circular unless title
+contains "نظام" / "قواعد" -> regulation.
+
+Retry, idempotency, observability, kill switch: identical to C1 pattern.
+
+Acceptance criteria:
+- AC-C2.1: at least 1 SAMA item ingested in the 48 hours before demo.
+- AC-C2.2: SAMA items appear in search results under banking-finance
+  queries.
+
+4.4 CONNECTOR C3 — MOJ / NATIONAL PLATFORM REGULATIONS FEED
+
+Source: the National Platform (my.gov.sa) regulations index at
+https://my.gov.sa/en/rules (Arabic at /ar/rules).
+
+Access method: HTML scraping of the regulations index, deduplicating
+against BOE items.
+
+Rationale for picking C3: aggregates regulations across many regulators
+(Ministry of Energy, MOJ, MEWA, SFDA, etc.) so the demo shows
+multi-regulator coverage with a single connector.
+
+Same contract as C1 / C2.
+
+Dedupe across connectors: before persisting, compare title_ar +
+date_hijri + decree number against existing documents; if match, attach
+as additional source_url rather than create a duplicate.
+
+Acceptance criteria:
+- AC-C3.1: connector ingests ≥3 new regulations in first 7 days.
+- AC-C3.2: at least one item correctly deduplicated against a BOE-sourced
+  item.
+
+4.5 SYNTHETIC DATA FOR DEMO ROBUSTNESS
+
+To guarantee the demo works even if a live connector is throttled, seed
+the demo environment with 50 synthetic Track 1 documents (clearly tagged
+source_track: "track1_external", source_connector_id: "synthetic")
+covering the six PoC practice areas. Generated by Codex from realistic
+templates; partner must approve before demo. Never mix synthetic with
+real production tenants.
+
+--------------------------------------------------------------------------------
+SECTION 5 — TRACK 3 CAPTURE FLOWS
+--------------------------------------------------------------------------------
+
+5.1 UPLOAD PIPELINE (PDF / DOCX drag-and-drop)
+
+UI: see §8 for Arabic-first upload screen.
+
+Server pipeline (sequence in text):
+
+User -> POST /api/v1/documents (multipart)
+  - FastAPI validates: max 100MB, ext in {.pdf, .docx, .doc, .jpg, .png, .tiff}
+  - Compute SHA-256 while streaming to MinIO
+  - Insert documents row (status='uploaded')
+  - Insert audit_log (action='upload')
+  - Enqueue Celery: ingest.process(doc_id)
+  - Return 202 + {doc_id, status_url}
+
+ingest.process(doc_id):
+  - Update status='processing'
+  - Step 1: text extraction
+      - if .docx -> python-docx
+      - if .pdf with text -> pdfplumber
+      - if .pdf scanned or image -> PaddleOCR
+      - if .pdf mixed -> page-by-page
+  - Step 2: Arabic OCR when needed
+      - rasterize PDF pages at 300 DPI
+      - PaddleOCR PP-OCRv5 Arabic model
+      - collect per-page mean confidence
+      - if mean < 0.6 -> flag low-confidence, still proceed
+  - Step 3: language detection (fasttext)
+  - Step 4: dedupe (sha256 vs documents.content_hash_sha256)
+      - if match -> status='duplicate_of', link, return
+  - Step 5: chunking (§6.1)
+  - Step 6: NER + classification + keyword extraction (§7)
+  - Step 7: PII detection (regex + spaCy/CAMeL)
+  - Step 8: privilege detection (§10.3 keyword list)
+  - Step 9: embedding generation (BGE-M3 per chunk, batch of 32)
+  - Step 10: persist chunks to PostgreSQL + pgvector
+  - Step 11: index BM25 fields to OpenSearch
+  - Step 12: apply quality gate (§5.4)
+      - if new contributor -> status='pending_review'
+      - if privilege_flag=true -> status='pending_review'
+      - else -> status='published'
+  - Step 13: emit document.ready event (SSE channel)
+  - Step 14: update metrics, emit audit_log
+
+Total latency target: ≤30 seconds for typical 5–15 page Arabic PDF on
+demo hardware (single GPU node).
+
+Failure modes:
+- OCR engine error -> retry once, fall back to Tesseract; if both fail,
+  status='processing_failed', surface in admin UI.
+- Embedding model timeout -> retry with smaller batch; persistent failure
+  -> status='processing_failed'.
+- Classification returns low confidence on all candidates -> fields left
+  blank, user prompted in confirmation screen.
+- Disk / storage full -> 507 to client, alert on-call.
+
+5.2 MANUAL ENTRY FLOW (new opinion / memo)
+
+Arabic structured form. Fields, RTL order:
+- نوع المستند (drop-down: legal_opinion / memo / precedent_note / template)
+- العنوان (text, Arabic, required)
+- مجال الممارسة (multi-select chips, Arabic labels)
+- الاختصاص القضائي (drop-down)
+- التاريخ — هجري / ميلادي toggle, both editable
+- ملخص تنفيذي (textarea, Arabic, optional)
+- المتن (rich text area, Arabic, required)
+- الكلمات المفتاحية (chip input, Arabic, auto-suggest from existing tags)
+- الأطراف (party rows, name_ar + role)
+- نطاق الإطلاع (radio: firm-wide / practice-area-only / restricted)
+- مرفقات (optional file attach)
+
+Auto-save: every 5 seconds, draft to documents with status='uploaded',
+then on submit moves to the same pipeline as upload (skipping OCR).
+
+5.3 CONFIRMATION SCREEN (post-upload)
+
+After Step 13, lawyer sees auto-detected metadata. Each field has:
+- Detected value in Arabic
+- Confidence indicator: high (green dot, ≥0.85), medium (amber,
+  0.6–0.85), low (red, <0.6)
+- Inline edit on click
+- "Why this value?" tooltip showing source span from OCR text
+
+Single button "تأكيد وفهرسة" commits metadata. Secondary "حفظ كمسودة"
+keeps editable. Closing page leaves doc in pending_review.
+
+5.4 QUALITY GATE
+
+Configurable, defaults:
+- New contributor (fewer than 5 published docs with no review rejection):
+  all uploads -> pending_review.
+- Established contributor (5+ clean): auto-publish unless privilege_flag
+  or visibility=restricted_matter.
+- Override: KM Lead can promote a user to "auto-publish" in admin UI.
+
+Quality gate is a single Python function
+compute_publish_status(user, doc, flags) -> Status so it's testable.
+Thresholds are config, not code.
+
+5.5 TRACK 2 STAND-INS FOR POC
+
+PoC ships with 25 synthetic "legacy" documents seeded as
+source_track="synthetic" carrying legacy_simulated=true so the demo shows
+the system populated as if Track 2 had run. Visually distinguishable in
+UI by a small badge "عينة تجريبية". Track 2 connectors not implemented
+in PoC.
+
+--------------------------------------------------------------------------------
+SECTION 6 — RAG LAYER
+--------------------------------------------------------------------------------
+
+6.1 CHUNKING STRATEGY FOR LEGAL ARABIC
+
+Legal Arabic has long, comma-rich sentences and numbered/bulleted
+clauses. Fixed-window chunking destroys citation integrity. Strategy:
+
+1. Paragraph-aware primary split: split on double-newline, then on
+   Arabic-aware sentence boundaries (؟ ! . and standalone newlines).
+2. Citation pattern preservation: detect Arabic legal markers (المادة /
+   Article, الفقرة / Paragraph, البند / Item) — never split inside the
+   span between a marker and its referenced number/letter. Regex:
+   (?:المادة|الفقرة|البند)\s+(?:[\u0660-\u0669\u0030-\u0039]+|[أبجدهوزحطيكلمنسعفصقرشتثخذضظغ])
+   is a non-splittable atom.
+3. Target chunk size: 400–600 tokens (BGE-M3 tokenizer), max 800.
+   Overlap 80 tokens.
+4. Heading carry-forward: each chunk carries the most recent heading as
+   a prefix [heading] ... chunk text ...
+5. Page mapping: store page_no, paragraph_no, char_start, char_end so
+   citations jump to source.
+6. Sentence-aware chunking specifically benefits Arabic.
+
+6.2 EMBEDDING MODEL
+
+Chosen: BGE-M3, 1024-dim dense vectors, self-hosted on single GPU
+(A100 / H100 in KSA). Tokenizer max length 8192.
+
+Why: see §2.3. Strongest open multilingual embedding for Arabic legal
+retrieval, runs in-region, supports hybrid (dense + sparse + multi-vector)
+outputs from one model.
+
+Alternatives held in reserve: multilingual-e5-large if BGE-M3 GPU
+unavailable; silma-embeddings-matryoshka for Arabic fine-tuning in pilot.
+
+Batching: 32 chunks per batch, FP16. Expected throughput ~500 chunks/sec
+on H100, ~200 on A100, ~30 on CPU fallback. PoC sizing assumes single
+A100.
+
+6.3 VECTOR STORE CONFIGURATION
+
+pgvector 0.7+ with HNSW:
+- embedding VECTOR(1024)
+- HNSW index: m=16, ef_construction=200
+- Query-time ef_search = 100
+- Distance: cosine (vectors L2-normalized at write)
+
+6.4 HYBRID RETRIEVAL
+
+Per query:
+1. Lexical (BM25) against OpenSearch with Arabic analyzer chain:
+     tokenizer: standard
+     filter: lowercase, arabic_normalization, arabic_stemmer,
+             decimal_digit, asciifolding
+     custom synonyms (admin-editable file in PoC, no UI)
+   Top 50 results, BM25 score.
+2. Dense against pgvector: top 50 by cosine.
+3. Fusion: Reciprocal Rank Fusion with k=60:
+     score = sum(1 / (k + rank_i))
+4. Optional rerank: top 30 -> bge-reranker-v2-m3 -> top 10. Enabled if
+   p95 latency budget < 2s allows; toggle via env var.
+5. Filter post-rank by user's visibility scope (firm_wide /
+   practice_area / restricted).
+
+6.5 CITATION TRACKING
+
+Every chunk has stable (doc_id, chunk_index, page_no, paragraph_no).
+System prompt forces citation format [¶N] where N is paragraph_no of
+chunk used. API returns:
+{answer, citations: [{marker, doc_id, chunk_id, page_no, paragraph_no,
+char_start, char_end, quoted_text}]}
+
+6.6 RAG PROMPTS
+
+System prompt (final, Arabic):
+
+أنت مساعد قانوني داخلي لمكتب السحيمان للمحاماة والاستشارات القانونية.
+
+مهمتك: الإجابة على أسئلة المستخدم استناداً حصراً إلى المقاطع المرفقة من المستندات.
+
+قواعد ملزمة، يجب الالتزام بها كلها دون استثناء:
+
+١. لغة الإجابة هي اللغة العربية الفصحى، حتى إذا كان السؤال أو المقاطع تحتوي على نصوص إنجليزية. لا تجب بالإنجليزية إلا إذا طلب المستخدم صراحةً ذلك.
+
+٢. لا تستخدم أي معلومة من خارج المقاطع المرفقة. إذا كانت المقاطع لا تكفي للإجابة بدقة، قل صراحةً وبدون اعتذار:
+   "المقاطع المتاحة لا تكفي للإجابة بدقة، يُنصح بمراجعة المستند الأصلي."
+
+٣. أدرج بعد كل ادعاء قانوني مرجعه على شكل [¶رقم] حيث الرقم هو رقم الفقرة المرجعية الوارد في المقاطع. لا تخترع أرقام فقرات.
+
+٤. لا تخترع أحكاماً أو مواد أو أنظمة قانونية لم ترد نصاً في المقاطع. وإذا أشار المقطع إلى مرجع خارجي (نظام، لائحة، حكم) دون نص كامل، اكتفِ بذكر الإشارة دون استنباط محتوى المرجع.
+
+٥. حافظ على المصطلحات القانونية كما وردت في المقطع. لا تُترجم المصطلحات العربية، ولا تستبدل مصطلحاً بمرادف عام.
+
+٦. إذا تعارضت المقاطع، أوضح التعارض ولا تُرجّح أحدها إلا إذا أوضح أحد المقاطع صراحةً أنه ناسخ أو معدّل للآخر.
+
+٧. أسلوب الإجابة: مباشر، دون مقدمات إنشائية مثل "بناءً على المقاطع" أو "يسعدني". ابدأ بالخلاصة، ثم اشرح، ثم أرفق المراجع.
+
+User message template:
+
+السؤال: {user_question}
+
+المقاطع المرجعية (من مستند: {doc_title_ar}):
+[¶1] {chunk_1_text}
+[¶2] {chunk_2_text}
+[¶3] {chunk_3_text}
+...
+
+الرجاء الإجابة وفق القواعد أعلاه.
+
+Call parameters:
+- model = "gpt-5"
+- temperature = 0.1 (legal Q&A wants determinism)
+- max_output_tokens = 1200
+- response_format = "text"
+- timeout_s = 25 (with 5s buffer under the 30s API timeout)
+
+REFUSAL PRE-FILTER: if retrieval returns fewer than 2 chunks with
+similarity >= 0.55, the system does NOT call GPT-5 — returns canned
+Arabic refusal: "لا توجد مقاطع كافية ذات صلة بالسؤال داخل هذا المستند.
+حاول إعادة صياغة السؤال أو توسيع نطاق البحث." This saves cost and
+prevents hallucination on weak retrieval.
+
+--------------------------------------------------------------------------------
+SECTION 7 — AI FEATURES
+--------------------------------------------------------------------------------
+
+7.1 SEMANTIC SEARCH (Arabic + mixed)
+
+Input: query string, optional filters (practice_area, doc_type,
+jurisdiction, date range).
+Behavior: see §6.4 hybrid retrieval.
+Latency target: p50 ≤ 800ms, p95 ≤ 2s.
+Precision/recall target: Recall@10 ≥ 0.80, MRR ≥ 0.60 on §7.5 benchmark.
+
+7.2 AUTO-TAGGING ON INGESTION
+
+Practice area + doc type: zero-shot LLM classification via LLMClient.
+
+Prompt:
+system: أنت مصنّف قانوني آلي. مهمتك تحديد نوع المستند ومجال الممارسة بناءً على النص المقدم.
+الإجابة يجب أن تكون JSON صالحاً فقط، دون أي شرح إضافي.
+
+user: المقتطف:
+{first_2_chunks_of_doc}
+
+العنوان المقترح: {filename_or_title}
+
+أجب بـ JSON بالشكل التالي:
+{
+  "doc_type": "<one of: judicial_ruling, legal_opinion, memo, pleading, contract, engagement_letter, regulation, royal_decree, council_resolution, circular, template, precedent_note, other>",
+  "doc_type_confidence": <0.0-1.0>,
+  "practice_area": ["<one or more of: corporate_commercial, litigation_dispute, banking_finance, real_estate, labor_employment, regulatory_compliance, ip, tax_zakat, construction, family_inheritance, criminal, administrative>"],
+  "practice_area_confidence": <0.0-1.0>,
+  "rationale_ar": "<short Arabic justification>"
+}
+
+Call parameters:
+- model = "gpt-5" (configurable down to "gpt-4.1" via env)
+- temperature = 0.0
+- max_output_tokens = 400
+- response_format = "json_object"
+- timeout_s = 15
+
+JSON parse failure (rare with json_object): one retry with stricter
+reminder; second failure -> fields left blank, doc to review.
+
+Parties (Arabic NER): CAMeL-Tools MSA NER on full doc text, post-filtered
+to PERSON and ORG, deduplicated, top-5 by frequency, role assigned via
+heuristic (first ORG mentioned as claimant if doc_type=judicial_ruling,
+else party_a).
+
+Jurisdiction: keyword lookup table first ("المملكة العربية السعودية" ->
+KSA, "محكمة التجارية بالرياض" -> KSA, "DIFC" -> DIFC, etc.); LLM
+fallback if no match.
+
+Dates: Hijri-Arabic regex
+\b(1[3-5][0-9]{2})[\/\-\\](0?[1-9]|1[0-2])[\/\-\\](0?[1-9]|[12][0-9]|3[01])\b
+and Gregorian variant; conversion via hijri-converter Python package.
+
+Latency target: all auto-tagging in parallel, total ≤ 10s.
+
+Accuracy target: measured on 20-doc fixture set; ≥80% practice_area
+correct, ≥85% doc_type correct.
+
+Human override: every detected field editable in confirmation screen
+(§5.3). Override events write to audit_log with action="tag_correction"
+and original + corrected values, ready to feed pilot's classifier
+retraining loop.
+
+7.3 PRECEDENT SUMMARIZATION
+
+One-paragraph Arabic synopsis, generated on first publish, cached.
+
+system: لخّص هذا المستند القانوني في فقرة عربية واحدة لا تتجاوز ٨٠ كلمة.
+ركّز على:
+- نوع المستند والجهة المصدرة
+- الأطراف
+- المسألة القانونية الجوهرية
+- النتيجة أو القاعدة المستفادة
+
+لا تضِف معلومات خارج النص المرفق.
+
+user: نص المستند:
+{first_3_chunks}
+
+Call parameters:
+- model = "gpt-5"
+- temperature = 0.2
+- max_output_tokens = 180
+- timeout_s = 20
+
+Stored in documents.summary_ar, regenerated only on document update.
+
+7.4 Q&A OVER DOCUMENT
+
+See §6.6. Returns answer + citations + chunks used (for transparency).
+Latency target: p95 ≤ 8s including retrieval and generation.
+
+7.5 EVALUATION HARNESS — ARABIC LEGAL BENCHMARK (15–20 queries)
+
+Test set wired into CI. Each row: query, target doc IDs, target doc_type,
+success criteria.
+
+| # | Arabic query | Likely target practice area | Expected top-3 includes |
+|---|---|---|---|
+| 1 | أحكام المحكمة التجارية في فسخ عقود التوريد للإخلال الجوهري | litigation_dispute, corporate_commercial | D1 |
+| 2 | متطلبات نظام مكافحة غسل الأموال لدى البنوك بالمملكة | banking_finance, regulatory_compliance | D3, SAMA Track 1 item |
+| 3 | المرسوم الملكي الخاص بنظام المعاملات المدنية | corporate_commercial | D2 |
+| 4 | شروط إنهاء عقد العمل من قبل صاحب العمل وفق نظام العمل | labor_employment | (labor synthetic) |
+| 5 | الحقوق العينية في نظام التسجيل العقاري السعودي | real_estate | (real estate Track 1 item) |
+| 6 | اختصاص ديوان المظالم في المنازعات الإدارية | administrative, litigation_dispute | (admin synthetic) |
+| 7 | إجراءات الاعتراض على حكم تجاري ابتدائي | litigation_dispute | (commercial appeal synthetic) |
+| 8 | لائحة حوكمة الشركات الصادرة عن هيئة السوق المالية | corporate_commercial, regulatory_compliance | (CMA synthetic) |
+| 9 | الزكاة المستحقة على الشركات المساهمة المدرجة | tax_zakat | (zakat synthetic) |
+| 10 | عقوبات الإخلال بحماية البيانات الشخصية بموجب نظام حماية البيانات | regulatory_compliance | (PDPL Track 1) |
+| 11 | شروط منح براءة الاختراع في المملكة | ip | (IP synthetic) |
+| 12 | تنفيذ الأحكام الأجنبية في المملكة العربية السعودية | litigation_dispute | (foreign judgments synthetic) |
+| 13 | المسؤولية التقصيرية في نظام المعاملات المدنية الجديد | corporate_commercial | D2 |
+| 14 | تأسيس شركة ذات مسؤولية محدودة في السعودية | corporate_commercial | (incorporation template synthetic) |
+| 15 | الميراث وقسمة التركات في المحاكم الشرعية | family_inheritance | (inheritance synthetic) |
+| 16 | SAMA AML penalties for commercial banks | banking_finance, regulatory_compliance | D3, SAMA item |
+| 17 | عقد المقاولة في النظام السعودي | construction | (construction synthetic) |
+| 18 | إنهاء عقد الإيجار التجاري قبل المدة | real_estate, corporate_commercial | (lease synthetic) |
+| 19 | غرامات الإفصاح المتأخر عن المعلومات الجوهرية للشركات المدرجة | corporate_commercial, regulatory_compliance | (CMA synthetic) |
+| 20 | حقوق العامل عند الفصل التعسفي | labor_employment | (labor synthetic) |
+
+Test method: for each query, retrieve top-10 results; pass if at least
+one expected doc is in top-3 AND Recall@10 ≥ 0.80 across the set.
+
+Q&A faithfulness eval: 20 question/answer pairs against D1, D2, D3 —
+manually labeled; CI computes citation-precision (fraction of cited
+paragraphs that actually contain the claim) ≥ 0.90.
+
+--------------------------------------------------------------------------------
+SECTION 8 — ARABIC-FIRST UI SPECIFICATION
+--------------------------------------------------------------------------------
+
+8.1 GLOBAL UI RULES
+
+- <html dir="rtl" lang="ar"> by default; toggle to dir="ltr" lang="en"
+  only when user sets English preference.
+- Primary UI font: IBM Plex Sans Arabic, weights 400/500/600/700;
+  fallback Tajawal, system-ui.
+- Body/document reading: Noto Naskh Arabic, weights 400/700; fallback
+  Amiri, serif.
+- Line height: 1.7 for Arabic body text (accommodates diacritics
+  without crowding); 1.5 for UI labels.
+- Text justification: text-justify: inter-word (browsers' default
+  kashida-based justification unreliable; inter-word avoids ragged
+  right edges on Arabic).
+- Numerals default: Western (0123) since most Saudi legal practitioners
+  read both fluently and Western numerals copy/paste cleanly. User
+  toggle in Settings for Hindi-Arabic (٠–٩).
+- Dates: Gregorian primary, Hijri secondary in parentheses, e.g.
+  "2024-03-12 (1445-09-02 هـ)". User toggle reverses primary/secondary.
+- Logical CSS: margin-inline-start, padding-inline-end,
+  border-inline-start. No left/right.
+- Tailwind RTL classes (rtl:ml-4 ltr:mr-4) for exceptions.
+- Icons: directional icons (arrows, chevrons) mirror via CSS
+  transform: scaleX(-1) in RTL.
+- Keyboard: support Arabic keyboard layout (browser handles input). All
+  keyboard shortcuts work the same; document in both languages.
+- Screen reader: lang="ar" on Arabic regions, lang="en" on English
+  islands within mixed pages, ARIA labels in Arabic.
+- WCAG 2.1 AA contrast minimum 4.5:1.
+- Color palette: neutral grayscale base, single accent (deep teal
+  #0F766E — works for both directions, accessible). Avoid culturally-
+  loaded colors.
+
+8.2 SCREEN-BY-SCREEN WIREFRAMES
+
+8.2.1 LOGIN SCREEN
+- Centered card, 400px wide.
+- Logo "السحيمان" top, "نظام إدارة المعرفة القانونية" subtitle.
+- Email field (LTR input even in RTL page).
+- Password field.
+- "تسجيل الدخول" button, full width, accent color.
+- "نسيت كلمة المرور؟" link below (PoC: dead-end placeholder).
+- Language toggle bottom-right corner.
+
+8.2.2 HOME / DASHBOARD
+Three-column layout in RTL:
+- Right rail (primary in RTL): "آخر التحديثات التنظيمية" card stack —
+  5 cards, each showing source (BOE / SAMA / MOJ), title_ar, date,
+  "اقرأ" link.
+- Main center: large Arabic search box, placeholder "ابحث في السوابق
+  والآراء والأنظمة…"; below, four quick-filter chips ("سوابق قضائية",
+  "آراء قانونية", "أنظمة ولوائح", "نماذج").
+- Left rail: "نشاطك" — recent uploads, recent searches, items in review
+  queue (if reviewer).
+
+Top bar: firm logo right, search shortcut middle, user avatar + name
+left, notifications bell, settings gear.
+
+8.2.3 UPLOAD SCREEN
+- Title: "رفع مستند جديد".
+- Drop zone center, dashed border, 500x250px, RTL icon
+  (document-arrow), text "اسحب الملف وأفلته هنا، أو" + button
+  "اختر من جهازك".
+- Supported formats note below: "PDF, DOCX, JPG, PNG — حتى 100 ميجابايت".
+- Optional metadata sidebar (right): pre-fill practice area,
+  jurisdiction, visibility before upload.
+- Upload progress bar with Arabic stages: "جاري الرفع…" -> "قراءة
+  المستند ضوئياً…" -> "استخلاص البيانات…" -> "الفهرسة…".
+- IN DEMO ENV ONLY: persistent banner "بيئة عرض تجريبي — لا تُرفع
+  مستندات عملاء حقيقية"; required checkbox before upload
+  "أؤكد أن هذا المستند لا يحتوي على بيانات عميل حقيقية".
+
+8.2.4 CONFIRMATION SCREEN (post-upload)
+- Title: "تأكيد بيانات المستند".
+- Two-column layout: visually-right (in RTL) shows document preview
+  (first page rendered as image); visually-left column lists
+  auto-detected fields.
+- Each field row: Arabic label, current value, confidence dot, edit
+  pencil icon, source-span tooltip.
+- Bottom: "تأكيد وفهرسة" (primary, accent), "حفظ كمسودة" (secondary),
+  "إلغاء" (text link).
+
+8.2.5 MANUAL ENTRY FORM
+Full RTL form, fields in §5.2 order, all labels Arabic. Rich text editor
+uses Arabic toolbar labels. Auto-save indicator top-right:
+"حُفظ منذ 3 ثوانٍ".
+
+8.2.6 SEARCH RESULTS
+- Search box at top.
+- Filters panel on the right (primary side in RTL): chips for
+  practice_area, doc_type, jurisdiction, date range.
+- Results list center: each card shows title_ar (large), one-line
+  snippet with Arabic highlight, doc_type badge, date, source badge
+  (firm / BOE / SAMA / …).
+- Preview pane visually-left: selected result preview, with
+  "افتح المستند" / "اسأل عن هذا المستند" buttons.
+
+8.2.7 DOCUMENT VIEW
+- Two-pane: reading pane (visually-right in RTL, dominant), tools pane
+  (visually-left).
+- Reading pane: Noto Naskh Arabic, 18px, 1.7 line height. Paragraph
+  numbers in the leading-edge margin.
+- Tools pane top: document metadata card (title, type, date, parties,
+  jurisdiction).
+- Tools pane middle: "اسأل عن هذا المستند" — text area, "اسأل" button,
+  conversation history below with citations.
+- Tools pane bottom: related documents (semantic neighbors),
+  "اقتبس هذا المستند" copy-to-clipboard formatted citation.
+- Clicking [¶N] citation in an answer scrolls reading pane to paragraph
+  and highlights for 2 seconds.
+
+8.2.8 ADMIN / REVIEW QUEUE
+- Tab strip top: "قائمة المراجعة", "إحصاءات", "المتصلون والوصلات",
+  "المستخدمون".
+- Review queue: pending docs, contributor name, upload time,
+  why-flagged badge (new contributor / privilege detected / low
+  confidence).
+- Per-item actions: "موافقة ونشر", "إعادة للمحرر", "رفض".
+- Ingestion stats: chart of uploads/day, OCR mean confidence trend,
+  search latency trend.
+
+8.3 ACCESSIBILITY
+
+- Focus rings visible on all interactive elements.
+- Tab order respects RTL reading order.
+- All buttons have ARIA labels in Arabic.
+- Form fields associated with <label> elements.
+- Live regions for status updates (role="status").
+- Screen reader users hear Arabic content with proper pronunciation if
+  NVDA/JAWS Arabic voice installed; lang attributes set correctly.
+
+--------------------------------------------------------------------------------
+SECTION 9 — API CONTRACT
+--------------------------------------------------------------------------------
+
+Base URL: /api/v1. All responses JSON; error responses RFC 7807
+problem+json. Auth via Authorization: Bearer <jwt>.
+
+9.1 ENDPOINTS
+
+| Method | Path | Purpose |
+|---|---|---|
+| POST | /auth/login | email/password -> JWT pair |
+| POST | /auth/refresh | refresh token -> new pair |
+| POST | /documents | multipart upload, returns doc_id |
+| POST | /documents/manual | structured manual entry |
+| GET | /documents/{doc_id} | retrieve metadata + content |
+| GET | /documents/{doc_id}/status | ingestion status |
+| GET | /documents/{doc_id}/raw | original file (signed URL) |
+| PATCH | /documents/{doc_id} | edit metadata (auditable) |
+| POST | /documents/{doc_id}/ask | RAG Q&A |
+| GET | /search | hybrid search |
+| GET | /documents/recent | list-recent |
+| GET | /review/queue | review queue (reviewer/admin only) |
+| POST | /review/{doc_id}/approve | approve and publish |
+| POST | /review/{doc_id}/reject | reject with reason |
+| POST | /review/{doc_id}/return | return to contributor with comments |
+| GET | /admin/stats | ingestion + search stats |
+| GET | /admin/connectors | connector status |
+| POST | /admin/connectors/{id}/trigger | manual run trigger |
+| POST | /admin/connectors/{id}/kill | toggle kill switch |
+
+9.2 SAMPLE REQUESTS/RESPONSES
+
+POST /documents (upload):
+Request: multipart/form-data with file, optional metadata JSON part.
+
+Response 202:
+```json
+{
+  "doc_id": "8d3f...",
+  "status": "uploaded",
+  "status_url": "/api/v1/documents/8d3f.../status",
+  "estimated_ready_seconds": 25
+}
+```
+
+GET /search?q=...&practice_area=corporate_commercial&limit=10
+
+Response 200:
+```json
+{
+  "query": "أحكام المحكمة التجارية بشأن فسخ العقود",
+  "total": 47,
+  "took_ms": 612,
+  "results": [
+    {
+      "doc_id": "00000000-0000-0000-0000-000000000001",
+      "title_ar": "حكم المحكمة التجارية بالرياض ...",
+      "snippet_ar": "...قضت المحكمة بفسخ العقد <em>للإخلال الجوهري</em>...",
+      "doc_type": "judicial_ruling",
+      "doc_type_ar": "حكم قضائي",
+      "practice_area": ["litigation_dispute", "corporate_commercial"],
+      "date_gregorian": "2024-03-12",
+      "score": 0.847,
+      "source_track": "track3_capture"
+    }
+  ]
+}
+```
+
+POST /documents/{doc_id}/ask
+
+Request:
+```json
+{
+  "question": "ما الأساس القانوني الذي اعتمدت عليه المحكمة في فسخ العقد؟",
+  "language": "ar"
+}
+```
+
+Response 200:
+```json
+{
+  "answer_ar": "اعتمدت المحكمة على المادة (X) من نظام المعاملات المدنية بشأن الإخلال الجوهري [¶3]، مستندةً إلى أن المدعى عليه أخلّ بالتزاماته الجوهرية المتعلقة بمواعيد التسليم [¶7]...",
+  "citations": [
+    {
+      "marker": "¶3",
+      "doc_id": "00000000-0000-0000-0000-000000000001",
+      "chunk_id": "...",
+      "page_no": 2,
+      "paragraph_no": 3,
+      "char_start": 1024,
+      "char_end": 1289,
+      "quoted_text_ar": "..."
+    }
+  ],
+  "model": "gpt-5",
+  "took_ms": 6420,
+  "retrieved_chunks": 5
+}
+```
+
+Error envelope (RFC 7807):
+```json
+{
+  "type": "https://ethka.dev/errors/document-not-found",
+  "title": "المستند غير موجود",
+  "title_en": "Document not found",
+  "status": 404,
+  "detail": "لا يوجد مستند بالمعرف المُقدَّم",
+  "instance": "/api/v1/documents/abc",
+  "trace_id": "..."
+}
+```
+
+9.3 RATE LIMITS (POC)
+
+| Endpoint | Per user limit |
+|---|---|
+| POST /documents | 30/min, 200/day |
+| POST /documents/*/ask | 20/min |
+| GET /search | 100/min |
+| All else | 200/min |
+
+429 returns Retry-After header.
+
+--------------------------------------------------------------------------------
+SECTION 10 — SECURITY AND COMPLIANCE FOR POC
+--------------------------------------------------------------------------------
+
+10.1 AUTHENTICATION
+
+PoC uses email/password + JWT (RS256, 15-min access, 30-day refresh).
+Refresh token rotation enabled. Passwords bcrypt cost 12.
+
+SSO upgrade path: swap auth issuer to Microsoft Entra ID OIDC for
+pilot — token validation logic unchanged because JWT format preserved.
+
+10.2 RBAC
+
+PoC roles:
+- lawyer — read firm-wide and practice-area documents, upload, Q&A,
+  search.
+- reviewer — lawyer + access to review queue, approve/reject.
+- km_lead — reviewer + connector controls, contributor promotion,
+  taxonomy edits (no UI in PoC, DB-only).
+- admin — full access.
+
+Enforced at FastAPI router level via dependency require_role. Postgres
+row-level security policies created but not relied upon (defense in
+depth, surfaces in pilot).
+
+10.3 PRIVILEGE DETECTION (PoC keyword list)
+
+Arabic privilege markers (any match flips privilege_flag=true):
+
+سري ومحمي
+امتياز محام-موكل
+سري للغاية
+لاستخدام المكتب فقط
+أعدّ لأغراض الاستشارة القانونية
+ATTORNEY-CLIENT PRIVILEGED
+PRIVILEGED AND CONFIDENTIAL
+
+Document with privilege_flag=true always routes through pending_review
+regardless of contributor status.
+
+10.4 SECRETS MANAGEMENT
+
+Vault dev instance in PoC, production-equivalent in demo env. App reads
+secrets via Vault Agent sidecar or AppRole auth. No secrets in env files
+in source.
+
+10.5 ENCRYPTION
+
+- In transit: TLS 1.3 for all external HTTPS; mTLS between internal
+  services.
+- At rest:
+  - MinIO: SSE-S3 (AES-256), key managed by MinIO KMS.
+  - Postgres: filesystem encryption (LUKS on data volume).
+  - Redis: in-memory; AOF persistence encrypted at filesystem level.
+- Backups encrypted (see §11).
+
+10.6 AUDIT LOGGING SHAPE
+
+Every state change writes to audit_log:
+```json
+{
+  "event_id": "uuid",
+  "ts": "ISO8601",
+  "actor_user_id": "uuid",
+  "actor_role": "lawyer",
+  "action": "upload | edit_metadata | approve | reject | search | ask | login | logout | connector_run | promote_contributor",
+  "target_type": "document | user | connector",
+  "target_id": "uuid",
+  "details": { "fields_changed": [...], "before": {...}, "after": {...} },
+  "ip": "...",
+  "user_agent": "..."
+}
+```
+
+Retention: 7 years (legal industry default). PoC stores in same Postgres
+in audit_log table; pilot moves to write-once storage.
+
+10.7 PDPL HANDLING AND THE POC RESIDENCY EXCEPTION
+
+The PoC operates OUTSIDE the production residency posture stated in the
+ETHKA brief, under a written exception scoped as follows. ETHKA produces
+this as a one-page addendum signed by the Managing Partner of
+Al-Suhaiman BEFORE any document is uploaded to the demo environment.
+
+SCOPE OF EXCEPTION:
+- The PoC environment is a demo environment, not production.
+- The only content processed by GPT-5 is: (a) public regulator content
+  acquired via Track 1 connectors (BOE, SAMA, National Platform), and
+  (b) synthetic firm-resembling content authored by ETHKA and
+  pre-approved by Al-Suhaiman.
+- No real client matter, no real party name, no real partner work
+  product, and no document containing real PII or real privileged
+  content is uploaded to the PoC environment. Enforced at three layers:
+  - Contractual (the addendum).
+  - Procedural (checkbox on upload screen "أؤكد أن هذا المستند لا
+    يحتوي على بيانات عميل حقيقية", required for non-admin users in
+    demo env).
+  - Technical (demo env carries env flag ENV=demo and the upload
+    pipeline blocks documents flagged with pii_flags != [] from leaving
+    the country — see below).
+
+DATA FLOW UNDER THE EXCEPTION:
+- Documents and embeddings: stored in KSA (Postgres, MinIO/S3, pgvector)
+  — never leave the country.
+- OCR: PaddleOCR self-hosted in KSA — never leaves.
+- Embeddings inference: BGE-M3 self-hosted in KSA — never leaves.
+- Arabic NER: CAMeL-Tools self-hosted in KSA — never leaves.
+- Only the following leave KSA, and only to OpenAI:
+  - Retrieved chunk text (top-k passages, max 5 × ~600 tokens = ~3000
+    tokens) for Q&A.
+  - First two chunks for auto-tagging classification.
+  - First three chunks for summarization.
+- Original PDFs, full document text, user identities, audit logs,
+  search queries that aren't being answered by RAG — none of these are
+  sent to OpenAI.
+
+TECHNICAL ENFORCEMENT CONTROLS:
+
+1. LLMClient is the ONLY code path that calls api.openai.com. All other
+   outbound traffic from the VPC is blocked at the NAT egress allowlist
+   except for connector targets (BOE, SAMA, National Platform domains).
+
+2. Before any call to GPT-5, the LLMClient runs a pre-flight check:
+
+   ```python
+   def can_send_to_external_llm(doc: Document) -> bool:
+       if doc.source_track == "track2_legacy":
+           return False  # Track 2 not in PoC anyway; defense in depth
+       if doc.privilege_flag:
+           return False  # never send privileged content out
+       if doc.pii_flags:  # national_id, iqama, iban, etc.
+           return False  # never send PII out
+       if doc.visibility == "restricted_matter":
+           return False
+       return True
+   ```
+
+   If the check fails, the system either refuses the Q&A operation with
+   a clear Arabic message ("هذا المستند لا يدخل ضمن نطاق العرض
+   التجريبي للمعالجة الخارجية") or falls back to a local-only path (in
+   PoC, this means "no answer", since no local LLM is deployed).
+
+3. The OpenAI API call is configured with headers OpenAI-Beta:
+   no-training and uses zero data retention request when ETHKA's
+   OpenAI account is eligible. ETHKA requests ZDR designation from
+   OpenAI before week 4. If ZDR is not granted in time, demo proceeds
+   under the exception but the addendum reflects standard retention.
+
+4. Every call to GPT-5 writes an audit log entry to
+   external_llm_calls table:
+   ```json
+   {
+     "action": "external_llm_call",
+     "model": "gpt-5",
+     "purpose": "qa | autotag | summarize",
+     "doc_id": "...",
+     "doc_source_track": "track1_external | synthetic",
+     "input_tokens": 2840,
+     "output_tokens": 312,
+     "latency_ms": 4210,
+     "ts": "..."
+   }
+   ```
+   This audit log is itself stored only in KSA.
+
+5. The exception expires at the end of Phase 1. At pilot kickoff, the
+   LLM swaps to a KSA-resident model and the production residency
+   posture takes effect. The LLMClient swap is a one-line config
+   change; call sites are unaffected.
+
+PDPL ANALYSIS UNDER THIS SCOPE: because no personal data (Saudi
+national ID, Iqama, real party names, real employee data, real client
+matter data) is processed under the PoC, the PDPL "sensitive personal
+data" trigger is not engaged. The exception is a COMMERCIAL decision
+about IP exposure of synthetic firm content, not a PDPL waiver. ETHKA's
+legal team confirms this analysis in writing before Al-Suhaiman signs
+the addendum.
+
+WHAT CODEX MUST IMPLEMENT TO ENFORCE 10.7:
+- The ENV=demo flag and the can_send_to_external_llm() pre-flight.
+- The Arabic confirmation checkbox on upload in demo environment.
+- A separate audit log table external_llm_calls in addition to the
+  main audit_log.
+- NAT egress allowlist via Terraform — api.openai.com added explicitly,
+  all other non-connector domains denied.
+- A startup self-check that refuses to boot the demo env if
+  OPENAI_API_KEY is missing AND LLM_REQUIRED=true.
+
+10.8 OUT-OF-SCOPE FOR POC (flagged)
+
+- Ethical walls (per-matter access exclusion lists).
+- Matter-level RBAC.
+- DSR/PDPL data-subject portal.
+- SSO, MFA.
+- Audit log review UI.
+- Per-tenant encryption keys.
+
+All listed in §18 with pilot pickup.
+
+--------------------------------------------------------------------------------
+SECTION 11 — INFRASTRUCTURE AND DEPLOYMENT
+--------------------------------------------------------------------------------
+
+11.1 CLOUD REGION
+
+Chosen: AWS Saudi Arabia region — me-central-2 (Riyadh) — primary
+target now that AWS Saudi Arabia reached GA in January 2026, with three
+Availability Zones around Riyadh, providing local data residency that
+satisfies SAMA and NCA cybersecurity requirements. All resources
+(compute, storage, vector DB, embeddings inference) deploy here.
+
+Alternative if me-central-2 service breadth is insufficient at PoC
+time: Oracle Cloud me-riyadh-1 (Riyadh, KSA, GA since July 2024) or
+Google Cloud KSA region. Bahrain (me-south-1) is REJECTED as PoC primary
+because all data and inference must be inside KSA, and Bahrain is not
+inside KSA.
+
+Service mapping (AWS me-central-2 target):
+
+| Component | AWS service | Alternative non-AWS |
+|---|---|---|
+| Compute | EKS (Kubernetes) | OKE on Oracle me-riyadh-1 |
+| Object store | S3 with SSE | OCI Object Storage |
+| Postgres | RDS for PostgreSQL 16 + pgvector | OCI Database for PostgreSQL |
+| OpenSearch | OpenSearch Service | self-hosted on K8s |
+| Redis | ElastiCache | self-hosted Redis on K8s |
+| GPU inference | EC2 G5/G6 with NVIDIA L4/A10G | OCI Bare Metal GPU |
+| Secrets | Secrets Manager + KMS | Vault on K8s |
+| Observability | Self-hosted OTel/Grafana on K8s | — |
+| Egress | NAT GW; restricted egress allowlist | — |
+
+[DECISION NEEDED — D3] AWS vs Oracle vs Google for KSA hosting. ETHKA
+confirms in week 1. PoC default: AWS me-central-2.
+
+11.2 TERRAFORM MODULE STRUCTURE
+
+infra/
+├── envs/
+│   ├── dev/         (engineer laptops, docker-compose; no Terraform)
+│   └── demo/
+│       ├── main.tf
+│       ├── variables.tf
+│       └── terraform.tfvars
+├── modules/
+│   ├── network/             (VPC, subnets, NAT, security groups)
+│   ├── eks-cluster/         (managed K8s, node groups, GPU node group)
+│   ├── rds-postgres/        (Postgres 16 with pgvector)
+│   ├── opensearch/          (managed OpenSearch with Arabic analyzer)
+│   ├── elasticache-redis/
+│   ├── minio-fallback/      (only if S3 unavailable)
+│   ├── observability/       (Grafana, Prometheus, Loki, Tempo)
+│   ├── vault-dev/           (Vault dev mode for PoC)
+│   └── domain-and-tls/      (Route53 + ACM cert)
+└── shared/
+    └── tags.tf              (mandatory tags: Project=suhaiman-km,
+                              Env=demo, Owner=ethka, DataClass=internal)
+
+State backend: S3 with versioning + DynamoDB lock (also in me-central-2).
+
+11.3 ENVIRONMENTS
+
+- dev: each engineer runs docker-compose locally. Synthetic data only.
+  No real connectors.
+- demo: single demo environment used for partner showcase and
+  acceptance testing. Real connectors enabled. Encrypted snapshots
+  nightly. URL demo.km.suhaiman.ethka.dev.
+
+No prod environment in PoC.
+
+11.4 CONTAINERS AND REGISTRY
+
+- All services dockerized. Multi-stage builds, distroless or
+  python:3.12-slim runtime.
+- Registry: ECR in me-central-2.
+- Image scanning: Trivy in CI gate; block on HIGH/CRITICAL CVEs.
+
+11.5 DEPLOYMENT TOPOLOGY (demo env)
+
+- 3 AZs (use AWS me-central-2 AZ-a/b/c).
+- EKS managed node groups:
+  - General compute: 2 × m6i.xlarge.
+  - GPU: 1 × g5.xlarge (NVIDIA A10G, 24GB VRAM) — runs embeddings +
+    reranker. No self-hosted LLM in PoC (using OpenAI).
+- RDS: db.m6g.large with 100GB gp3.
+- OpenSearch: 3 × r6g.medium.search.
+- Redis: cache.t4g.small.
+
+11.6 COST ESTIMATE (POC monthly, demo env)
+
+Infrastructure (24/7):
+
+| Item | Approx. monthly USD |
+|---|---|
+| EKS control plane | $73 |
+| 2× m6i.xlarge | $280 |
+| 1× g5.xlarge (single A10G, embeddings + reranker) | $550 |
+| RDS db.m6g.large | $180 |
+| OpenSearch 3× r6g.medium | $360 |
+| ElastiCache cache.t4g.small | $30 |
+| S3 + data transfer | $50 |
+| NAT GW + egress (incl. OpenAI traffic) | $90 |
+| Backups + snapshots | $30 |
+| Route53 + ACM | $5 |
+| Infra subtotal | ~$1,650/month |
+
+OpenAI GPT-5 usage estimate for PoC build + acceptance:
+
+Assumptions:
+- Q&A calls during dev and demo: ~500 total over 4–6 weeks
+- Auto-tagging during dev: ~1,500 docs (real + synthetic)
+- Summarization: ~1,500 docs
+- Average input tokens per Q&A: 3,500 (system + 5 chunks + question)
+- Average output tokens per Q&A: 400
+- Average input tokens per autotag: 1,500 (2 chunks + prompt)
+- Average output tokens per autotag: 250
+- Average tokens per summarization: 2,000 in / 180 out
+
+| Workload | Total in-tokens | Total out-tokens | Indicative cost range |
+|---|---|---|---|
+| Q&A (500 calls) | 1.75M | 200K | $25–$75 |
+| Autotag (1,500 calls) | 2.25M | 375K | $35–$95 |
+| Summarize (1,500 calls) | 3.0M | 270K | $40–$100 |
+| Dev/test/CI evals | ~3M total | ~500K | $40–$100 |
+| Total OpenAI for PoC build | | | $140–$370 one-off |
+
+After demo, monthly steady-state for small user group: ~$80–$200/month
+at light usage.
+
+TOTAL POC RUNNING COST: ~$1,700–$1,850/month (infra + light LLM), plus
+one-off ~$300 for build-time OpenAI tokens.
+
+Shutting down GPU off-hours can drop ~$300/month.
+
+ETHKA confirms current AWS me-central-2 pricing and current OpenAI
+pricing in week 1.
+
+11.7 BACKUP POSTURE (POC)
+
+- RDS automated daily snapshots, 7-day retention.
+- S3 versioning on bucket.
+- OpenSearch snapshot to S3 daily.
+- No DR cross-region (deferred to pilot — and once me-central-2 has
+  multi-region pairing options).
+
+--------------------------------------------------------------------------------
+SECTION 12 — CI/CD AND QUALITY GATES
+--------------------------------------------------------------------------------
+
+12.1 GITHUB ACTIONS PIPELINE
+
+.github/workflows/build.yml:
+
+stages:
+  - lint:
+      - ruff (python), eslint (frontend), tflint (terraform)
+  - test-unit:
+      - pytest (backend), vitest (frontend)
+  - test-integration:
+      - docker-compose up, run integration suite
+  - test-ai-quality:
+      - per-PR: run 5-query smoke test from §7.5
+      - on merge to main and nightly: run full 20-query benchmark
+      - gate: Recall@10 >= 0.80, MRR >= 0.60
+      - run RAG faithfulness eval; gate: citation precision >= 0.90
+  - test-ui-snapshot:
+      - Playwright RTL snapshot tests (key screens in Arabic)
+  - security-scan:
+      - Trivy on built images
+      - gitleaks for secrets
+      - Bandit on Python
+      - npm audit / pip-audit
+  - build-and-push:
+      - docker build, push to ECR
+  - terraform-plan:
+      - manual gate to apply
+  - deploy-demo:
+      - on main branch after manual approval
+
+12.2 QUALITY GATES (block merge if failing)
+
+- Coverage >= 70% backend, >= 60% frontend (PoC bar).
+- AI quality benchmark thresholds (above).
+- UI snapshot tests stable.
+- No HIGH/CRITICAL CVE in image scan.
+- No secrets detected.
+
+--------------------------------------------------------------------------------
+SECTION 13 — OBSERVABILITY
+--------------------------------------------------------------------------------
+
+13.1 LOGS
+
+JSON, one event per line, fields: ts, level, service, env, trace_id,
+span_id, user_id, doc_id, action, outcome, latency_ms, message. Shipped
+to Loki.
+
+13.2 METRICS (Prometheus)
+
+Core metrics every service exports:
+- http_requests_total{route,method,status}
+- http_request_duration_seconds_bucket{route}
+- ingest_pipeline_duration_seconds_bucket{stage}
+- ocr_confidence_histogram
+- search_results_total{has_results}
+- rag_answers_total{cited}
+- connector_items_total{connector_id,outcome}
+- queue_depth{queue}
+- worker_busy_ratio{worker_type}
+
+LLM-specific (replaces v1.0 LLM block):
+- llm_calls_total{model, purpose, outcome} — purpose ∈
+  {qa, autotag, summarize}, outcome ∈ {success, parse_error, timeout,
+  refused, content_filter}
+- llm_latency_seconds_bucket{model, purpose}
+- llm_input_tokens_total{model, purpose}
+- llm_output_tokens_total{model, purpose}
+- llm_estimated_cost_usd_total{model, purpose} — computed from token
+  counts × current price config
+- llm_preflight_blocked_total{reason} — when can_send_to_external_llm()
+  returns false; reason ∈ {privilege, pii, restricted_matter, track2}
+
+13.3 TRACES (OpenTelemetry)
+
+Every external boundary creates a span. Cross-service propagation via
+W3C Trace Context headers. Tail-based sampling at the Tempo collector —
+keep all errors and slow (>2s) traces, 10% sampling otherwise.
+
+13.4 DASHBOARDS (Grafana, in-cluster)
+
+Five PoC dashboards Codex provisions:
+
+1. Ingestion Health — uploads/hour, pipeline stage latency p50/p95, OCR
+   confidence distribution, failures by reason.
+2. Search Quality — query volume, latency p50/p95, zero-result rate,
+   click-through (event collected but no learning loop active).
+3. RAG Quality + External LLM Usage — Q&A volume, latency, refusal
+   rate, faithfulness eval CI trend, LLM token usage by purpose, daily
+   spend, preflight blocks.
+4. Connector Status — per-connector last-success age, items
+   fetched/new/dup, error rate, kill-switch state.
+5. System Health — CPU/mem/disk per node, queue depth, error budget
+   burn.
+
+13.5 ALERTS
+
+| Alert | Threshold | Channel |
+|---|---|---|
+| Ingest pipeline p95 > 60s for 10m | warn | Slack #suhaiman-ops |
+| Search p95 > 2s for 10m | warn | Slack |
+| Connector no success in 24h | crit | Slack + email |
+| LLM error rate > 5% over 15m | crit | Slack + email |
+| Disk > 85% on Postgres or MinIO | crit | Slack + email |
+| Worker DLQ depth > 10 | warn | Slack |
+| Auth failures > 50/min from single IP | crit | Slack |
+| OpenAI p95 latency > 12s for 10m | warn | Slack |
+| OpenAI daily spend > $50 (sanity cap on PoC) | warn | Slack + email |
+| LLM preflight blocks > 5/hour in demo env | warn | Slack + email |
+| OpenAI API unreachable for > 5 minutes | crit | Slack + email + on-call page |
+
+--------------------------------------------------------------------------------
+SECTION 14 — TESTING STRATEGY
+--------------------------------------------------------------------------------
+
+14.1 UNIT TESTS
+
+- Backend: ~70% coverage target.
+- Critical: Arabic text normalization, chunking boundary rules, date
+  parsers (Hijri/Gregorian), classification prompt response parser,
+  privilege keyword detector, RBAC dependency,
+  can_send_to_external_llm.
+
+14.2 INTEGRATION TESTS
+
+- docker-compose stack spins up; pytest suite hits real Postgres, real
+  MinIO, real OpenSearch.
+- Scenarios:
+  - upload -> poll status -> search -> find -> ask -> cite
+  - manual entry -> search -> find
+  - duplicate upload -> returns existing doc_id
+  - connector run against recorded HTTP fixture (vcr.py) -> ingest ->
+    search
+  - upload with privilege keyword -> Q&A refuses to leave KSA
+
+14.3 END-TO-END (Playwright)
+
+- The 7-step demo scenario from §1.2 as a Playwright test. CI fails if
+  any step fails.
+- RTL layout snapshot on six key screens.
+
+14.4 AI QUALITY
+
+- §7.5 benchmark wired into CI: 5-query smoke test per PR, full
+  20-query benchmark on merge to main and nightly.
+- Q&A faithfulness eval on the 20-pair set with same cadence.
+- Auto-tagging accuracy per-PR on 20-doc set.
+
+14.5 LOAD (modest for PoC)
+
+- Locust scenario: 5 concurrent uploaders + 20 concurrent searchers for
+  10 minutes.
+- Pass criteria: p95 search ≤ 2.5s under load; no failed uploads;
+  CPU < 80%.
+
+--------------------------------------------------------------------------------
+SECTION 15 — DEMO PLAN
+--------------------------------------------------------------------------------
+
+15.1 THE 10-MINUTE DEMO SCRIPT
+
+Setup before the demo (90 minutes before):
+- Ensure demo env is up, all green on dashboard.
+- Trigger BOE and SAMA connectors manually so latest items are visible.
+- Clear test user's recent uploads / searches.
+- Pre-stage two PDFs on demo laptop: حكم_تجاري_2024_عينة.pdf and
+  رأي_قانوني_غسل_أموال.pdf.
+
+Minute 0–1 — Frame the problem.
+ETHKA opens: "Today you'll see Lawyer A upload a court ruling in
+Arabic. Within thirty seconds, the system has read it, tagged it, and
+made it searchable. Then Lawyer B will find it by asking a question in
+Arabic — and the system will quote the exact passage that answers
+them."
+
+Minute 1–3 — Upload and auto-tag (Lawyer A's screen).
+Drag حكم_تجاري_2024_عينة.pdf onto the drop zone. Show the four-stage
+progress bar in Arabic. When confirmation screen opens, narrate the
+auto-detected fields: "Document type, judicial ruling — high
+confidence. Practice area, commercial and litigation. Issuing body,
+Riyadh Commercial Court. The court named these two parties. The date
+in both calendars. Three Arabic keywords." Click "تأكيد وفهرسة". Toast
+appears: "تم الحفظ والفهرسة — جاهز للبحث".
+
+Minute 3–5 — Show regulator freshness.
+Pan to the home screen's right rail: "آخر التحديثات التنظيمية". Point
+to two items pulled from BOE and SAMA today. Click one — full doc opens
+with original source link.
+
+Minute 5–8 — Search and find (Lawyer B's screen, second laptop).
+Lawyer B logs in. Search: "أحكام المحكمة التجارية بشأن فسخ العقود
+التجارية". Top three results appear in under two seconds. The
+just-uploaded ruling is #1. Open it. Reading pane shows Arabic body in
+Noto Naskh; paragraph numbers in margin.
+
+Minute 8–9.5 — Ask the document.
+In the Q&A pane: "ما الأساس القانوني الذي اعتمدت عليه المحكمة في فسخ
+العقد؟". The answer streams back in Arabic, 4–5 sentences, with [¶3]
+and [¶7] citations. Click [¶3] — reading pane jumps and highlights the
+cited paragraph.
+
+Minute 9.5–10 — Close.
+"Everything you just saw runs against documents that never leave Saudi
+Arabia, except for short retrieved passages sent to the AI model — and
+none of those passages come from real client matters; they come from
+published regulations and our synthetic samples. The pilot will swap
+that AI model for a Saudi-resident one, add the firm's own twenty years
+of memos, the ethical walls between matters, and the system's ability
+to learn from how you use it. That's the conversation we have next."
+
+15.2 FALLBACKS
+
+- If a Track 1 connector hasn't fetched anything in the last 24h ->
+  right rail falls back to synthetic regulator items pre-seeded.
+- If OpenAI is unreachable during the demo (network issue, OpenAI
+  outage, key revoked): the system displays a clear Arabic banner
+  "خدمة الإجابة الذكية غير متاحة مؤقتاً — البحث والمستندات تعمل بشكل
+  طبيعي". Search, document upload, auto-tagging fallback (rule-based
+  on filename + keyword presence), and document reading all still
+  work. The Q&A demo step is replaced with a pre-recorded screen
+  capture played from the demo laptop — engineers acknowledge openly
+  that this segment is recorded.
+- If GPT-5 latency spikes mid-demo (>15s on a question): system
+  streams "جارٍ الإجابة…" indicator with 20-second progress; if
+  exceeded, falls back to GPT-4.1 with a small badge "تم استخدام
+  النموذج البديل". Automatic.
+- Cost runaway protection: daily spend cap configured in OpenAI
+  account settings ($50/day for demo env). Hitting cap fails Q&A calls
+  open with canned refusal until rolled over.
+- If upload pipeline takes >45 seconds live -> engineer pre-uploads
+  during minute 0–1 narration and continues as if it just finished.
+
+--------------------------------------------------------------------------------
+SECTION 16 — BUILD SEQUENCE FOR CODEX — 4–6 WEEK SPRINT
+--------------------------------------------------------------------------------
+
+Each week ends with a working internal milestone demo. Codex builds in
+the order below; ETHKA-led work (cloud accounts, partner sign-offs)
+runs in parallel.
+
+WEEK 0 (pre-sprint — ETHKA-led, ~3 days):
+- Provision cloud account in me-central-2 (or alternative per D3).
+- Domain demo.km.suhaiman.ethka.dev, ACM cert.
+- Vault dev instance.
+- GitHub repo, Codex access, CI runners.
+- OpenAI organization for the project, GPT-5 access enabled,
+  project-scoped API key with spend caps (D9), ZDR request submitted.
+- Partner pre-approval of test PDFs and synthetic data set.
+- Signed residency exception addendum (P13).
+
+WEEK 1 — FOUNDATIONS.
+- Codex sets up monorepo (frontend, backend, infra, evals).
+- Terraform network, eks-cluster, rds-postgres, opensearch,
+  elasticache-redis modules.
+- Postgres schema from §3 DDL.
+- FastAPI skeleton with auth (email/password + JWT), RBAC dependency.
+- Next.js skeleton with RTL + Arabic fonts + login screen + home shell.
+- Docker-compose dev stack.
+- CI pipeline scaffolding.
+- LLMClient abstraction with OpenAIChatGPTClient adapter, env wiring.
+- Milestone: a user can log in, see an empty Arabic home page. LLM
+  client can be smoke-tested with a hello-world prompt.
+
+WEEK 2 — INGESTION CORE.
+- Upload endpoint, MinIO/S3 storage, Celery worker scaffolding.
+- PaddleOCR worker, language detection, chunking, normalization.
+- BGE-M3 embedding service.
+- Indexing into Postgres + pgvector + OpenSearch.
+- Confirmation screen UI (auto-detected fields editable).
+- can_send_to_external_llm pre-flight implemented.
+- Demo-env upload banner + checkbox.
+- Milestone: upload a real Arabic PDF, see it appear in DB and
+  OpenSearch with chunks and embeddings. Auto-tagging not yet wired.
+
+WEEK 3 — SEARCH + AI TAGGING.
+- Hybrid search endpoint (BM25 + dense + RRF).
+- Optional reranker (toggle).
+- Auto-tagging via LLMClient (GPT-5 json_object) + parser; NER for
+  parties; date extraction.
+- Search UI with filters and snippet highlighting.
+- Document view UI with reading pane and metadata card.
+- Milestone: upload -> auto-tag -> confirm -> search -> find.
+  End-to-end without Q&A.
+
+WEEK 4 — RAG Q&A + CONNECTORS.
+- RAG service: retrieval, prompt assembly, LLMClient.complete call,
+  citation parsing.
+- Q&A panel in document view; citation click-to-scroll.
+- Connector C1 (BOE) end-to-end with kill switch and observability.
+- Connector C2 (SAMA) implemented.
+- Connector C3 (National Platform aggregator) implemented.
+- Review queue + admin UI.
+- external_llm_calls audit log + dashboard panel.
+- Milestone: full §1.2 acceptance test passes on demo env.
+
+WEEK 5 — HARDENING AND QUALITY.
+- §7.5 benchmark wired into CI (5-query smoke per PR; full 20-query +
+  faithfulness on main and nightly); iterate prompts/chunking until
+  thresholds pass.
+- UI polish, Arabic typography QA (native Arabic speaker on ETHKA's
+  side reviews every screen).
+- Performance pass: hit latency targets.
+- Observability dashboards built.
+- Security pass: secrets scanning, dependency audit, basic pen test
+  of auth.
+- Milestone: demo env passes all acceptance criteria; load test passes.
+
+WEEK 6 (BUFFER) — DRESS REHEARSAL AND PARTNER-FACING POLISH.
+- Three full demo run-throughs with ETHKA partners playing
+  partner-audience role.
+- Fallback procedures tested (including OpenAI-unreachable scenario).
+- User docs (Arabic) for the demo flow.
+- Final synthetic data approval.
+- Handover: ops runbook, known issues log, pilot scope draft.
+
+CODEX BUILDS VS HUMAN-HANDLED:
+- Codex: all software, infrastructure-as-code, CI/CD, dashboards, eval
+  harnesses.
+- ETHKA / human: cloud account creation, domain registration, OpenAI
+  account + ZDR request, partner sign-offs, real document curation,
+  Arabic copy review, BOE/SAMA legal posture confirmation, demo
+  logistics, PDPL DPIA document.
+
+--------------------------------------------------------------------------------
+SECTION 17 — OPEN DECISIONS AND ASSUMPTIONS LOG
+--------------------------------------------------------------------------------
+
+17.1 [DECISION NEEDED] ITEMS
+
+| ID | Decision | Status |
+|---|---|---|
+| D1 | LLM choice for PoC | RESOLVED: OpenAI GPT-5 via api.openai.com, under written residency exception (§10.7). |
+| D2 | SAMA access method (RSS vs HTML scrape) | Open — Codex verifies week 1. |
+| D3 | Cloud provider in KSA: AWS me-central-2 vs Oracle me-riyadh-1 vs Google KSA | Open — ETHKA confirms week 1. PoC default: AWS me-central-2. |
+| D4 | Hosted Claude on Bedrock me-central-2 | Deferred to pilot. KSA-resident production model selection happens at pilot kickoff. |
+| D5 | bge-reranker-v2-m3 enabled in PoC pipeline | Open — Codex decides week 4 from latency data. |
+| D6 | Arabic font licensing for production (IBM Plex Sans Arabic + Noto Naskh Arabic) | Al-Suhaiman brand review week 5. Both OFL/SIL — free for commercial use. |
+| D7 | "عينة تجريبية" synthetic-data badge visibility in demo | Partner principal — recommend keep badge visible. Week 5. |
+| D8 | Apply for OpenAI ZDR (zero data retention) designation | ETHKA submits request in week 1; if granted by week 4, demo runs with ZDR. If not, demo proceeds under standard retention. The addendum reflects the actual posture. |
+| D9 | Daily/total spend cap on OpenAI account | ETHKA finance + partner principal — recommend $50/day demo cap, $1,000 hard cap on the project key. Enforced via OpenAI account settings, not app code. |
+
+17.2 ASSUMPTIONS CATALOGUE
+
+A1–A8 in §1.1. Each testable in week 1 of discovery (post-PoC). PoC
+build proceeds on these.
+
+17.3 HUMAN-ACTION DEPENDENCIES (run in parallel)
+
+- ETHKA legal: confirms legal posture paragraph for each connector
+  with Al-Suhaiman's managing partner.
+- Al-Suhaiman partner principal: signs off on taxonomy enum values
+  (practice areas, doc types, jurisdictions) before week 2 ends —
+  Codex hardcodes them in week 1.
+- ETHKA: signed residency exception addendum from managing partner
+  before any document is uploaded to demo env.
+- ETHKA: OpenAI account setup, GPT-5 access, ZDR request, spend caps
+  in week 0.
+- Al-Suhaiman IT: provisions a dedicated demo email account for any
+  email-to-system stub.
+- ETHKA: produces PDPL DPIA covering the PoC processing.
+- Al-Suhaiman: identifies one partner and one associate as week-5 demo
+  subjects who will use the system end-to-end before the formal
+  partner showcase.
+
+--------------------------------------------------------------------------------
+SECTION 18 — WHAT'S DELIBERATELY NOT IN THE POC AND WHY
+--------------------------------------------------------------------------------
+
+| Capability | Why deferred | Where it picks up |
+|---|---|---|
+| Full self-learning loops (LTR, classifier retrain, embedding refresh, lifecycle, query learning) | PoC corpus too small (≤500 docs) to produce statistically meaningful signal. Plus: PoC's reliance on an external LLM means any learning loop's signals would leave KSA if it touched the LLM. Pilot's KSA-resident LLM unlocks the learning loops. | Pilot, with weekly lightweight + monthly full retrain cadence, gated by A/B eval and PDPL approval |
+| Track 2 legacy migration | Requires firm IT access, partner archive access, PDPL DPIA for legacy content, and content audit instrument | Pilot weeks 1–6 (parallel with Track 3 scale-up) |
+| Multi-tenancy | One firm, single tenant — multi-tenancy is a productization concern for the GCC SaaS roadmap | Productization phase post-pilot |
+| Mobile native apps | Responsive web covers PoC; native deferred until usage data justifies the engineering cost | Phase 2 |
+| Ethical walls / matter-level access | Requires matter taxonomy, conflicts database, partner sign-off on rule semantics | Pilot — formal requirement before any privileged matter content enters the system |
+| Advanced governance workflows (parallel approvals, escalation, quarterly refresh automation) | Single review queue is enough to prove the workflow pattern; PoC pilot use is too small to need parallelism | Pilot |
+| DMS integration | Firm has no DMS today (per A4); reassess in pilot | Pilot or Phase 2 |
+| Email-to-system ingestion | API supports it; live mail server hookup deferred | Pilot |
+| SSO / MFA | Auth design is upgrade-compatible; SSO not needed for ≤20 demo users | Pilot first week |
+| Audit log review UI | Audit logs are written and queryable in PoC; admin UI for browsing them is pilot-grade | Pilot |
+| Per-tenant encryption keys | Single-tenant PoC | Productization |
+| Hijri date arithmetic | Display conversion only in PoC | Pilot if firm signals workflows on Hijri dates |
+| Self-hosted KSA-resident LLM | PoC uses OpenAI GPT-5 under residency exception for demo quality; sovereignty restored at pilot | Pilot kickoff |
+| Phase 2 features: LMS, competency framework, AI-augmented research, BI dashboards | Out of Phase 1 entirely per the original proposal | Phase 2 |
+
+--------------------------------------------------------------------------------
+END OF SPECIFICATION
+--------------------------------------------------------------------------------
+
+VERSION HISTORY
+- v1.0 — Initial Codex-ready PoC spec (ALLaM-7B as default LLM).
+- v1.1 — Consolidated. LLM swapped to OpenAI GPT-5 via api.openai.com
+  under a written residency exception (§10.7). LLMClient abstraction
+  introduced (§2.5). Cost estimates updated (§11.6). Metrics, alerts,
+  and demo fallbacks updated for external LLM dependency (§13, §15.2).
+  D1 marked RESOLVED; new D8 (ZDR) and D9 (spend cap) added.
+
+================================================================================
+END OF FILE
+================================================================================

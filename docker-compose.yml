@@ -58,10 +58,10 @@ services:
   backend:
     build:
       context: ./backend
+    env_file:
+      - .env
     environment:
-      ENV: dev
       DATABASE_URL: postgresql+psycopg://suhaiman:suhaiman@postgres:5432/suhaiman_km
-      LLM_REQUIRED: "false"
     ports:
       - "8000:8000"
     depends_on:
