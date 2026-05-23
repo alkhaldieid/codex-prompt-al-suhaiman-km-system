@@ -95,6 +95,9 @@ export function HomeShell() {
             <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
               <Upload className="mb-3 h-5 w-5 text-accent-dark" />
               <div className="font-semibold">لا توجد عمليات رفع حديثة</div>
+              <a href="/upload" className="mt-3 inline-block text-sm font-semibold text-accent-dark">
+                رفع مستند جديد
+              </a>
             </div>
             <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
               <FileText className="mb-3 h-5 w-5 text-accent-dark" />

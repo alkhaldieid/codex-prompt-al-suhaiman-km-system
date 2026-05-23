@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     ocr_model: str = "gpt-5"
     embeddings_model: str = "text-embedding-3-large"
     embeddings_dimensions: int = 3072
+    max_upload_bytes: int = 100 * 1024 * 1024
+    storage_root: str = "/tmp/suhaiman-km-storage"
 
 
 @lru_cache

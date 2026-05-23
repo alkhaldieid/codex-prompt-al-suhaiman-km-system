@@ -31,3 +31,22 @@ export async function getMe(accessToken: string) {
   }
   return response.json();
 }
+
+export async function uploadDocument(accessToken: string, file: File, confirmedDemo: boolean) {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("confirm_no_real_client_data", String(confirmedDemo));
+
+  const response = await fetch(`${API_BASE}/documents`, {
+    method: "POST",
+    headers: {Authorization: `Bearer ${accessToken}`},
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null);
+    throw new Error(problem?.title ?? "تعذر رفع المستند");
+  }
+
+  return response.json();
+}
