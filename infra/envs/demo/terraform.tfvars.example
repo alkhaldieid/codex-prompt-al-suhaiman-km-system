@@ -1,0 +1,4 @@
+env         = "demo"
+aws_region  = "me-central-2"
+vpc_cidr    = "10.42.0.0/16"
+domain_name = "demo.km.suhaiman.ethka.dev"

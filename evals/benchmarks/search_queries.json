@@ -1,0 +1,22 @@
+[
+  {"id": 1, "query": "أحكام المحكمة التجارية في فسخ عقود التوريد للإخلال الجوهري", "expected_top3": ["00000000-0000-0000-0000-000000000001"]},
+  {"id": 2, "query": "متطلبات نظام مكافحة غسل الأموال لدى البنوك بالمملكة", "expected_top3": ["00000000-0000-0000-0000-000000000003", "sama-track1-item"]},
+  {"id": 3, "query": "المرسوم الملكي الخاص بنظام المعاملات المدنية", "expected_top3": ["00000000-0000-0000-0000-000000000002"]},
+  {"id": 4, "query": "شروط إنهاء عقد العمل من قبل صاحب العمل وفق نظام العمل", "expected_top3": ["labor-synthetic"]},
+  {"id": 5, "query": "الحقوق العينية في نظام التسجيل العقاري السعودي", "expected_top3": ["real-estate-track1"]},
+  {"id": 6, "query": "اختصاص ديوان المظالم في المنازعات الإدارية", "expected_top3": ["admin-synthetic"]},
+  {"id": 7, "query": "إجراءات الاعتراض على حكم تجاري ابتدائي", "expected_top3": ["commercial-appeal-synthetic"]},
+  {"id": 8, "query": "لائحة حوكمة الشركات الصادرة عن هيئة السوق المالية", "expected_top3": ["cma-synthetic"]},
+  {"id": 9, "query": "الزكاة المستحقة على الشركات المساهمة المدرجة", "expected_top3": ["zakat-synthetic"]},
+  {"id": 10, "query": "عقوبات الإخلال بحماية البيانات الشخصية بموجب نظام حماية البيانات", "expected_top3": ["pdpl-track1"]},
+  {"id": 11, "query": "شروط منح براءة الاختراع في المملكة", "expected_top3": ["ip-synthetic"]},
+  {"id": 12, "query": "تنفيذ الأحكام الأجنبية في المملكة العربية السعودية", "expected_top3": ["foreign-judgments-synthetic"]},
+  {"id": 13, "query": "المسؤولية التقصيرية في نظام المعاملات المدنية الجديد", "expected_top3": ["00000000-0000-0000-0000-000000000002"]},
+  {"id": 14, "query": "تأسيس شركة ذات مسؤولية محدودة في السعودية", "expected_top3": ["incorporation-template-synthetic"]},
+  {"id": 15, "query": "الميراث وقسمة التركات في المحاكم الشرعية", "expected_top3": ["inheritance-synthetic"]},
+  {"id": 16, "query": "SAMA AML penalties for commercial banks", "expected_top3": ["00000000-0000-0000-0000-000000000003", "sama-track1-item"]},
+  {"id": 17, "query": "عقد المقاولة في النظام السعودي", "expected_top3": ["construction-synthetic"]},
+  {"id": 18, "query": "إنهاء عقد الإيجار التجاري قبل المدة", "expected_top3": ["lease-synthetic"]},
+  {"id": 19, "query": "غرامات الإفصاح المتأخر عن المعلومات الجوهرية للشركات المدرجة", "expected_top3": ["cma-disclosure-synthetic"]},
+  {"id": 20, "query": "حقوق العامل عند الفصل التعسفي", "expected_top3": ["labor-synthetic"]}
+]

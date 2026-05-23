@@ -1,0 +1,40 @@
+[project]
+name = "suhaiman-km-backend"
+version = "0.1.0"
+description = "Arabic-first legal KM PoC backend"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.111.0",
+  "uvicorn[standard]>=0.30.0",
+  "pydantic-settings>=2.3.0",
+  "sqlalchemy>=2.0.30",
+  "psycopg[binary]>=3.1.19",
+  "passlib[bcrypt]>=1.7.4",
+  "bcrypt<4.1",
+  "python-jose[cryptography]>=3.3.0",
+  "python-multipart>=0.0.9",
+  "email-validator>=2.2.0",
+  "httpx>=0.27.0",
+  "openai>=1.35.0",
+  "structlog>=24.2.0",
+  "prometheus-client>=0.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2.0",
+  "pytest-asyncio>=0.23.0",
+  "ruff>=0.4.0",
+  "bandit>=1.7.8",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
