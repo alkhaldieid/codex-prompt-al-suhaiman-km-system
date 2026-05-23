@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 
 from app.models import Document, DocumentChunk, DocumentStatus
 from app.services.text_extraction import extract_text_from_upload
-from app.services.text_processing import chunk_text, normalize_arabic
+from app.services.text_processing import clean_extracted_text, chunk_text, normalize_arabic
 
 
 def process_uploaded_document_inline(db: Session, *, doc: Document, content: bytes) -> None:
@@ -22,10 +22,11 @@ def process_uploaded_document_inline(db: Session, *, doc: Document, content: byt
         db.commit()
         return
 
-    doc.extracted_text = extracted_text
+    clean_text = clean_extracted_text(extracted_text)
+    doc.extracted_text = clean_text
     doc.processing_stage = "indexing"
     doc.status_detail_ar = "تم استخراج النص وتجزئته مبدئياً"
-    for index, chunk in enumerate(chunk_text(extracted_text), start=1):
+    for index, chunk in enumerate(chunk_text(clean_text), start=1):
         db.add(
             DocumentChunk(
                 doc_id=doc.doc_id,
