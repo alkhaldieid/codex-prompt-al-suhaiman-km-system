@@ -74,3 +74,31 @@ export async function getDocument(accessToken: string, docId: string) {
   }
   return response.json();
 }
+
+export async function searchRegulations(accessToken: string, query: string) {
+  const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`, {
+    headers: {Authorization: `Bearer ${accessToken}`},
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null);
+    throw new Error(problem?.title ?? "تعذر البحث");
+  }
+  return response.json();
+}
+
+export async function askRegulations(accessToken: string, question: string) {
+  const response = await fetch(`${API_BASE}/search/ask`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({question}),
+  });
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null);
+    throw new Error(problem?.title ?? "تعذر توليد الإجابة");
+  }
+  return response.json();
+}

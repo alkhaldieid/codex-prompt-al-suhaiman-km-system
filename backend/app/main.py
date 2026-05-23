@@ -7,7 +7,7 @@ from app.core.config import get_settings
 from app.core.errors import AppProblem, problem_exception_handler
 from app.core.logging import configure_logging
 from app.db.session import SessionLocal
-from app.services.startup import create_schema, run_startup_self_check, seed_demo_users
+from app.services.startup import create_schema, run_startup_self_check, seed_startup_data
 
 configure_logging()
 logger = structlog.get_logger()
@@ -34,5 +34,5 @@ def startup() -> None:
     run_startup_self_check(settings)
     create_schema()
     with SessionLocal() as db:
-        seed_demo_users(db)
+        seed_startup_data(db)
     logger.info("service_started", service="backend", env=settings.env)

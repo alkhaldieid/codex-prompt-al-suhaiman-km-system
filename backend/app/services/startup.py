@@ -5,6 +5,7 @@ from app.auth.security import hash_password
 from app.core.config import Settings
 from app.db.session import Base, engine
 from app.models import User, UserRole
+from app.services.regulatory_seed import seed_regulatory_corpus
 
 
 def run_startup_self_check(settings: Settings) -> None:
@@ -37,3 +38,8 @@ def seed_demo_users(db: Session) -> None:
             )
         )
     db.commit()
+
+
+def seed_startup_data(db: Session) -> None:
+    seed_demo_users(db)
+    seed_regulatory_corpus(db)
