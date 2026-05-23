@@ -1,0 +1,84 @@
+{
+  "fetched_at_utc": "2026-05-23T18:50:32.583053+00:00",
+  "source_base_url": "https://laws.boe.gov.sa",
+  "items": [
+    {
+      "slug": "civil_transactions_law",
+      "title_ar": "نظام المعاملات المدنية",
+      "doc_type": "regulation",
+      "practice_area": [
+        "corporate_commercial",
+        "real_estate",
+        "litigation_dispute"
+      ],
+      "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/655fdb42-8c96-422b-b8c4-b04f0095c94c/1",
+      "filename": "civil_transactions_law.txt",
+      "char_count": 207425,
+      "sha256": "1f93c39aec10332e16ec6bad46c72144f3caeccc453b1f9ad8e0b53a4f9ed526"
+    },
+    {
+      "slug": "labor_law",
+      "title_ar": "نظام العمل",
+      "doc_type": "regulation",
+      "practice_area": [
+        "labor_employment"
+      ],
+      "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/08381293-6388-48e2-8ad2-a9a700f2aa94/1",
+      "filename": "labor_law.txt",
+      "char_count": 180171,
+      "sha256": "91ab058625bfa8101084fe7cf3298d0b7ce906eaa6f486a928ca4586b92b3cf1"
+    },
+    {
+      "slug": "pdpl",
+      "title_ar": "نظام حماية البيانات الشخصية",
+      "doc_type": "regulation",
+      "practice_area": [
+        "regulatory_compliance"
+      ],
+      "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/b7cfae89-828e-4994-b167-adaa00e37188/1",
+      "filename": "pdpl.txt",
+      "char_count": 50586,
+      "sha256": "bb6271b22208d07fecfd7f764126aecfcd410fe0e606dbd4926d77b2a5d025c3"
+    },
+    {
+      "slug": "aml_law",
+      "title_ar": "نظام مكافحة غسل الأموال",
+      "doc_type": "regulation",
+      "practice_area": [
+        "banking_finance",
+        "regulatory_compliance",
+        "criminal"
+      ],
+      "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/0657dfce-95f8-463a-9d87-aa3900ec7b51/1",
+      "filename": "aml_law.txt",
+      "char_count": 40519,
+      "sha256": "4ca69000ef0e3e56cd683a0bf1f2e598e1c9857cca7305b64c7c69485e952d24"
+    },
+    {
+      "slug": "companies_law",
+      "title_ar": "نظام الشركات",
+      "doc_type": "regulation",
+      "practice_area": [
+        "corporate_commercial",
+        "regulatory_compliance"
+      ],
+      "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/a8376aea-1bc3-49d4-9027-aed900b555af/1",
+      "filename": "companies_law.txt",
+      "char_count": 187264,
+      "sha256": "9182696ff18b21d459884d4aee1a315ca51cdd8f49d3f4ffba4bc25cdda39f08"
+    },
+    {
+      "slug": "commercial_courts_law",
+      "title_ar": "نظام المحاكم التجارية",
+      "doc_type": "regulation",
+      "practice_area": [
+        "litigation_dispute",
+        "corporate_commercial"
+      ],
+      "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/38334008-3b70-4c6c-b3af-aba3016a8061/1",
+      "filename": "commercial_courts_law.txt",
+      "char_count": 40697,
+      "sha256": "a40b572a8538197574c9306ae540453d06b278cc0cc2a1ed0e102504e1f7b46f"
+    }
+  ]
+}
