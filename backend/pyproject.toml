@@ -18,6 +18,8 @@ dependencies = [
   "openai>=1.35.0",
   "structlog>=24.2.0",
   "prometheus-client>=0.20.0",
+  "pypdf>=5.0.0",
+  "python-docx>=1.1.2",
 ]
 
 [project.optional-dependencies]

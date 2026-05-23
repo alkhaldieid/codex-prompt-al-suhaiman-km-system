@@ -5,6 +5,7 @@ class DocumentUploadResponse(BaseModel):
     doc_id: str
     status: str
     status_url: str
+    document_url: str
     estimated_ready_seconds: int
     message_ar: str
 
@@ -25,3 +26,6 @@ class DocumentDetailResponse(BaseModel):
     source_track: str
     original_filename: str
     mime_type: str
+    status_detail_ar: str
+    extracted_text_preview: str
+    chunk_count: int

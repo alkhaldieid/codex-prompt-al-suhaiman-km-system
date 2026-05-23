@@ -50,3 +50,27 @@ export async function uploadDocument(accessToken: string, file: File, confirmedD
 
   return response.json();
 }
+
+export async function getDocumentStatus(accessToken: string, docId: string) {
+  const response = await fetch(`${API_BASE}/documents/${docId}/status`, {
+    headers: {Authorization: `Bearer ${accessToken}`},
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null);
+    throw new Error(problem?.title ?? "تعذر تحميل حالة المستند");
+  }
+  return response.json();
+}
+
+export async function getDocument(accessToken: string, docId: string) {
+  const response = await fetch(`${API_BASE}/documents/${docId}`, {
+    headers: {Authorization: `Bearer ${accessToken}`},
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null);
+    throw new Error(problem?.title ?? "تعذر تحميل المستند");
+  }
+  return response.json();
+}

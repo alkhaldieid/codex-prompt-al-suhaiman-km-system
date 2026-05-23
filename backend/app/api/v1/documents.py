@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, Header, Response, UploadFile
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.auth.dependencies import get_current_user
 from app.core.config import get_settings
@@ -12,6 +12,7 @@ from app.db.session import get_db
 from app.models import Document, DocumentStatus, SourceTrack, User
 from app.schemas.documents import DocumentDetailResponse, DocumentStatusResponse, DocumentUploadResponse
 from app.services.ingestion_progress import INGESTION_STAGES, INGESTION_TARGET_SECONDS
+from app.services.inline_ingestion import process_uploaded_document_inline
 from app.services.storage import LocalObjectStorage, get_storage
 from app.services.upload_validation import is_allowed_upload_filename
 
@@ -73,6 +74,7 @@ async def upload_document(
             doc_id=str(existing.doc_id),
             status=existing.status.value,
             status_url=f"/api/v1/documents/{existing.doc_id}/status",
+            document_url=f"/api/v1/documents/{existing.doc_id}",
             estimated_ready_seconds=INGESTION_TARGET_SECONDS,
             message_ar="تم العثور على مستند مطابق محفوظ مسبقاً",
         )
@@ -96,7 +98,7 @@ async def upload_document(
     db.add(doc)
     db.flush()
     doc.storage_key = storage.put_raw(doc_id=doc.doc_id, filename=file.filename, content=content)
-    db.commit()
+    process_uploaded_document_inline(db, doc=doc, content=content)
 
     if idempotency_key:
         response.headers["Idempotency-Key"] = idempotency_key
@@ -105,8 +107,9 @@ async def upload_document(
         doc_id=str(doc.doc_id),
         status=doc.status.value,
         status_url=f"/api/v1/documents/{doc.doc_id}/status",
+        document_url=f"/api/v1/documents/{doc.doc_id}",
         estimated_ready_seconds=INGESTION_TARGET_SECONDS,
-        message_ar="تم الرفع — ستظهر مراحل المعالجة باللغة العربية",
+        message_ar=doc.status_detail_ar,
     )
 
 
@@ -116,7 +119,7 @@ def document_status(
     _: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> DocumentStatusResponse:
-    doc = db.get(Document, doc_id)
+    doc = db.scalar(select(Document).options(selectinload(Document.chunks)).where(Document.doc_id == doc_id))
     if doc is None:
         raise AppProblem(
             status=404,
@@ -157,4 +160,7 @@ def get_document(
         source_track=doc.source_track.value,
         original_filename=doc.original_filename,
         mime_type=doc.mime_type,
+        status_detail_ar=doc.status_detail_ar,
+        extracted_text_preview=doc.extracted_text[:1200],
+        chunk_count=len(doc.chunks),
     )

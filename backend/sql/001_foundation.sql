@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS documents (
   mime_type TEXT NOT NULL DEFAULT 'application/octet-stream',
   processing_stage TEXT NOT NULL DEFAULT 'uploading',
   status_detail_ar TEXT NOT NULL DEFAULT 'تم استلام المستند',
+  extracted_text TEXT NOT NULL DEFAULT '',
   ocr_metadata JSONB,
   summary_ar TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),

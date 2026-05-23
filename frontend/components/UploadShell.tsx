@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CheckCircle2, FileUp, Loader2, ShieldAlert } from "lucide-react";
-import { uploadDocument } from "@/lib/api";
+import { CheckCircle2, FileText, FileUp, Loader2, ShieldAlert } from "lucide-react";
+import { getDocument, getDocumentStatus, uploadDocument } from "@/lib/api";
 
 const stages = ["جاري الرفع…", "قراءة المستند ضوئياً…", "استخلاص البيانات…", "الفهرسة…"];
 
@@ -13,6 +13,10 @@ export function UploadShell() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [docId, setDocId] = useState("");
+  const [statusLabel, setStatusLabel] = useState("");
+  const [preview, setPreview] = useState("");
+  const [chunkCount, setChunkCount] = useState<number | null>(null);
 
   const selectedFileLabel = useMemo(() => {
     if (!file) return "لم يتم اختيار ملف";
@@ -37,6 +41,10 @@ export function UploadShell() {
     setBusy(true);
     setError("");
     setMessage("");
+    setDocId("");
+    setStatusLabel("");
+    setPreview("");
+    setChunkCount(null);
     setStageIndex(0);
     const timer = window.setInterval(() => {
       setStageIndex((current) => Math.min(current + 1, stages.length - 1));
@@ -44,8 +52,15 @@ export function UploadShell() {
 
     try {
       const result = await uploadDocument(token, file, confirmed);
+      const uploadedDocId = result.doc_id as string;
+      const status = await getDocumentStatus(token, uploadedDocId);
+      const document = await getDocument(token, uploadedDocId);
       setStageIndex(stages.length - 1);
       setMessage(result.message_ar ?? "تم الرفع — ستستكمل المعالجة خلال أقل من دقيقتين");
+      setDocId(uploadedDocId);
+      setStatusLabel(status.stage_label_ar ?? "");
+      setPreview(document.extracted_text_preview ?? "");
+      setChunkCount(document.chunk_count ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "تعذر رفع المستند");
     } finally {
@@ -111,10 +126,31 @@ export function UploadShell() {
           ) : null}
 
           {message ? (
-            <div role="status" className="mt-6 flex items-center gap-2 rounded-lg bg-teal-50 p-4 text-teal-900">
-              <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
-              {message}
+            <div role="status" className="mt-6 rounded-lg bg-teal-50 p-4 text-teal-900">
+              <div className="flex items-center gap-2 font-semibold">
+                <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
+                {message}
+              </div>
+              {docId ? (
+                <div className="mt-3 space-y-1 text-sm">
+                  <div dir="ltr" className="text-left">doc_id: {docId}</div>
+                  <div>الحالة: {statusLabel}</div>
+                  <div>عدد المقاطع: {chunkCount ?? 0}</div>
+                </div>
+              ) : null}
             </div>
+          ) : null}
+
+          {preview ? (
+            <section className="mt-6 rounded-lg border border-slate-200 bg-white p-4">
+              <div className="mb-3 flex items-center gap-2 font-semibold text-slate-900">
+                <FileText className="h-5 w-5 text-accent-dark" aria-hidden="true" />
+                معاينة النص المستخرج
+              </div>
+              <p className="max-h-72 overflow-auto whitespace-pre-wrap font-textArabic text-lg leading-8 text-slate-800">
+                {preview}
+              </p>
+            </section>
           ) : null}
 
           {error ? <div role="alert" className="mt-6 rounded-lg bg-red-50 p-4 text-red-700">{error}</div> : null}

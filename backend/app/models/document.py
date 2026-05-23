@@ -46,6 +46,7 @@ class Document(Base):
     mime_type: Mapped[str] = mapped_column(String(255))
     processing_stage: Mapped[str] = mapped_column(String(64), default="uploading")
     status_detail_ar: Mapped[str] = mapped_column(Text, default="تم استلام المستند")
+    extracted_text: Mapped[str] = mapped_column(Text, default="")
     created_by: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
