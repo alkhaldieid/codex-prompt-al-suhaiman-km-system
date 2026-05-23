@@ -8,7 +8,7 @@ EXCEPTION WHEN duplicate_object THEN null; END $$;
 DO $$ BEGIN
   CREATE TYPE document_status AS ENUM (
     'uploaded', 'processing', 'pending_review', 'published',
-    'archived', 'rejected', 'duplicate_of'
+    'archived', 'rejected', 'duplicate_of', 'processing_failed'
   );
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
@@ -37,10 +37,15 @@ CREATE TABLE IF NOT EXISTS documents (
   source_connector_id TEXT,
   visibility TEXT NOT NULL DEFAULT 'firm_wide',
   privilege_flag BOOLEAN NOT NULL DEFAULT false,
-  pii_flags TEXT[] NOT NULL DEFAULT '{}',
+  pii_flags TEXT NOT NULL DEFAULT '',
   status document_status NOT NULL DEFAULT 'uploaded',
   duplicate_of_doc_id UUID REFERENCES documents(doc_id),
   content_hash_sha256 TEXT,
+  storage_key TEXT NOT NULL DEFAULT '',
+  original_filename TEXT NOT NULL DEFAULT '',
+  mime_type TEXT NOT NULL DEFAULT 'application/octet-stream',
+  processing_stage TEXT NOT NULL DEFAULT 'uploading',
+  status_detail_ar TEXT NOT NULL DEFAULT 'تم استلام المستند',
   ocr_metadata JSONB,
   summary_ar TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
