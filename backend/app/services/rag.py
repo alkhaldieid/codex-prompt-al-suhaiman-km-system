@@ -168,9 +168,13 @@ def ask(
 
     retrieved, retrieval_ms = retrieve_chunks(db, question, limit=TOP_K, doc_id=doc_id)
 
-    # Step 1 — relevance pre-filter
+    # Step 1 — relevance pre-filter. Doc-scoped asks (a single document
+    # may legitimately have only 1 chunk above threshold) require ≥1;
+    # corpus-wide asks require ≥2 so we don't answer from a single
+    # accidental near-match.
+    min_chunks = 1 if doc_id is not None else MIN_CHUNKS
     kept = [c for c in retrieved if c.vector_score >= MIN_COSINE]
-    if len(kept) < MIN_CHUNKS:
+    if len(kept) < min_chunks:
         return _refusal(
             "low_relevance",
             REFUSAL_LOW_RELEVANCE,
@@ -186,7 +190,7 @@ def ask(
             allowed.append(c)
         else:
             blocked_reasons.add(reason or "unknown")
-    if len(allowed) < MIN_CHUNKS:
+    if len(allowed) < min_chunks:
         return _refusal(
             "policy:" + ",".join(sorted(blocked_reasons)) if blocked_reasons else "policy",
             REFUSAL_POLICY,

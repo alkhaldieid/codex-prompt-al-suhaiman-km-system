@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Bell, FileText, Loader2, Search, Settings, Upload } from "lucide-react";
-import { askRegulations, getMe, searchRegulations } from "@/lib/api";
+import { getMe } from "@/lib/api";
 
 type User = {
   display_name_ar: string;
@@ -34,21 +34,10 @@ export function HomeShell() {
 
   async function runSearch(event?: React.FormEvent<HTMLFormElement>) {
     event?.preventDefault();
-    const token = window.localStorage.getItem("suhaiman_access_token");
-    if (!token || !query.trim()) return;
-    setBusy(true);
-    setError("");
-    setAnswer("");
-    try {
-      const search = await searchRegulations(token, query);
-      const ask = await askRegulations(token, query);
-      setResults(search.results ?? []);
-      setAnswer(ask.answer_ar ?? "");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "تعذر البحث");
-    } finally {
-      setBusy(false);
-    }
+    if (!query.trim()) return;
+    // Delegate to the full search page so all results, filters, and the
+    // doc-viewer flow are reachable from the home search box.
+    window.location.href = `/search?q=${encodeURIComponent(query.trim())}`;
   }
 
   return (
