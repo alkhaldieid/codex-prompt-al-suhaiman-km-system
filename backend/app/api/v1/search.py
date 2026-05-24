@@ -28,13 +28,19 @@ def search(
         "results": [
             {
                 "doc_id": str(item.doc.doc_id),
+                "chunk_id": str(item.chunk.chunk_id),
                 "title_ar": item.doc.title_ar,
                 "snippet_ar": item.snippet,
                 "doc_type": item.doc.doc_type,
                 "doc_type_ar": item.doc.doc_type,
+                "practice_area": item.doc.practice_area,
+                "paragraph_no": item.chunk.paragraph_no,
                 "date_gregorian": None,
-                "score": item.score,
+                "score": round(item.score, 6),
+                "bm25_score": round(item.bm25_score, 4),
+                "vector_score": round(item.vector_score, 4),
                 "source_track": item.doc.source_track.value,
+                "source_url": item.doc.source_url,
             }
             for item in retrieved
         ],

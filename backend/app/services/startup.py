@@ -9,6 +9,7 @@ from app.db.session import Base, engine
 from app.models import Document, SourceTrack, User, UserRole
 from app.services.regulatory_seed import seed_regulatory_corpus
 from app.services.migrations import apply_migrations
+from app.services.search_index import backfill_all_chunks, ensure_index
 
 logger = logging.getLogger(__name__)
 
@@ -69,3 +70,5 @@ def seed_startup_data(db: Session) -> None:
     seed_demo_users(db)
     purge_placeholder_seed(db)
     seed_regulatory_corpus(db)
+    ensure_index()
+    backfill_all_chunks(db)
