@@ -13,8 +13,10 @@ from app.models import Document, DocumentStatus, SourceTrack, User
 from app.schemas.documents import DocumentDetailResponse, DocumentStatusResponse, DocumentUploadResponse
 from app.services.ingestion_progress import INGESTION_STAGES, INGESTION_TARGET_SECONDS
 from app.services.inline_ingestion import process_uploaded_document_inline
+from app.services.rag import ask as rag_ask
 from app.services.storage import LocalObjectStorage, get_storage
 from app.services.upload_validation import is_allowed_upload_filename
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -164,3 +166,36 @@ def get_document(
         extracted_text_preview=doc.extracted_text[:1200],
         chunk_count=len(doc.chunks),
     )
+
+
+class AskRequest(BaseModel):
+    question: str
+    language: str | None = "ar"
+
+
+@router.post("/{doc_id}/ask")
+def ask_document(
+    doc_id: UUID,
+    payload: AskRequest,
+    _: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """RAG Q&A scoped to one document (§9.1)."""
+    doc = db.get(Document, doc_id)
+    if doc is None:
+        raise AppProblem(
+            status=404,
+            title="المستند غير موجود",
+            detail="لا يوجد مستند بالمعرف المُقدَّم",
+            type_="https://ethka.dev/errors/document-not-found",
+        )
+    result = rag_ask(db, payload.question, doc_id=doc_id)
+    return {
+        "answer_ar": result.answer_ar,
+        "citations": result.citations,
+        "model": result.model,
+        "took_ms": result.took_ms,
+        "retrieved_chunks": result.retrieved_chunks,
+        "refused": result.refused,
+        "refusal_reason": result.refusal_reason,
+    }

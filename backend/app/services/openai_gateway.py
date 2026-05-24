@@ -143,9 +143,17 @@ def chat_complete(
     max_output_tokens: int = 1200,
     response_format: Literal["text", "json_object"] = "text",
     timeout_s: int = 25,
+    reasoning_effort: str | None = "minimal",
     request_id: str | None = None,
 ) -> ChatResult:
-    """Chat completion. Model defaults to settings.llm_model (gpt-5)."""
+    """Chat completion. Model defaults to settings.llm_model (gpt-5).
+
+    For gpt-5 we use max_completion_tokens (not max_tokens), do not pass
+    temperature (only default is supported), and default reasoning_effort
+    to "minimal" so output isn't starved by invisible reasoning tokens.
+    Bump the budget for gpt-5 since it counts reasoning + visible output
+    against the same cap.
+    """
     _preflight(subject, purpose.value)
 
     settings = get_settings()
@@ -158,10 +166,11 @@ def chat_complete(
         "timeout": timeout_s,
         "extra_headers": {"OpenAI-Beta": "no-training", "X-Request-ID": request_id or ""},
     }
-    # GPT-5 only supports the default temperature (1) and uses
-    # max_completion_tokens. GPT-4.x still uses max_tokens + custom temperature.
     if chosen_model.startswith("gpt-5"):
-        request_args["max_completion_tokens"] = max_output_tokens
+        # Reserve headroom even with minimal reasoning.
+        request_args["max_completion_tokens"] = max(max_output_tokens * 3, 3000)
+        if reasoning_effort:
+            request_args["reasoning_effort"] = reasoning_effort
     else:
         request_args["max_tokens"] = max_output_tokens
         if temperature is not None:

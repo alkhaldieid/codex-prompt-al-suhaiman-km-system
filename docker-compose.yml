@@ -72,6 +72,17 @@ services:
       postgres:
         condition: service_healthy
 
+  # `docker compose --profile dev-no-llm up backend-no-llm` runs the
+  # backend without requiring an OpenAI key. Search degrades to BM25-only;
+  # /ask returns a clean upstream-error envelope.
+  backend-no-llm:
+    profiles: ["dev-no-llm"]
+    extends:
+      service: backend
+    environment:
+      LLM_REQUIRED: "false"
+      OPENAI_API_KEY: ""
+
   frontend:
     build:
       context: ./frontend
