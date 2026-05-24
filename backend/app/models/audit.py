@@ -24,7 +24,19 @@ class ExternalOpenAICall(Base):
     model: Mapped[str] = mapped_column(String(128))
     purpose: Mapped[OpenAIPurpose] = mapped_column(Enum(OpenAIPurpose))
     doc_id: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
-    doc_source_track: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    # doc_source_track column is the source_track enum in Postgres; accept
+    # raw strings on insert and let psycopg cast via the enum.
+    doc_source_track: Mapped[str | None] = mapped_column(
+        Enum(
+            "track1_external",
+            "track2_legacy",
+            "track3_capture",
+            "synthetic",
+            name="source_track",
+            create_type=False,
+        ),
+        nullable=True,
+    )
     input_tokens: Mapped[int] = mapped_column(Integer, default=0)
     output_tokens: Mapped[int] = mapped_column(Integer, default=0)
     vector_count: Mapped[int] = mapped_column(Integer, default=0)

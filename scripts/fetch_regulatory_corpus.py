@@ -113,14 +113,31 @@ def extract_law_text(html: str) -> str:
     return out.strip()
 
 
-def slice_law_body(text: str) -> str:
-    """Trim BOE chrome around the law body using stable Arabic anchors.
+CHROME_LINE_PATTERNS = [
+    r'^\s*\{\}\]\+\$".*$',  # form regex fragments
+    r"^البحث في النظام\s*$",
+    r"^تصفية النتائج\s*$",
+    r"^مسح النتائج\s*$",
+    r"^نـ+ـص النظـ+ـام\s*$",
+    r"^مادة معدلة\s*$",
+    r"^مادة ملغية\s*$",
+    r"^اصل الوثيقة\s*$",
+    r"^أصل الوثيقة\s*$",
+    r"^الإصدار\s*$",
+    r"^تاريخ النظام\s*$",
+    r"^الحالة\s*$",
+]
+_CHROME_RE = re.compile("|".join(f"(?:{p})" for p in CHROME_LINE_PATTERNS), re.M)
 
-    Keeps everything from the first occurrence of an article-style marker
-    (المادة, الفصل, الباب, مرسوم ملكي) onward, dropping prior nav/breadcrumbs.
-    Conservative — if no anchor is found, returns full cleaned text.
+
+def slice_law_body(text: str) -> str:
+    """Trim BOE chrome at both ends using stable Arabic anchors.
+
+    Start: cut everything before the first article-style marker.
+    End: cut at the first portal-footer marker so trailing nav doesn't
+    contaminate chunks.
     """
-    anchors = [
+    head_anchors = [
         "المادة الأولى",
         "المادة (الأولى)",
         "المادة ١",
@@ -130,13 +147,33 @@ def slice_law_body(text: str) -> str:
         "مرسوم ملكي",
     ]
     earliest = len(text)
-    for needle in anchors:
+    for needle in head_anchors:
         idx = text.find(needle)
         if 0 <= idx < earliest:
             earliest = idx
-    if earliest < len(text):
-        return text[earliest:].strip()
-    return text
+    body = text[earliest:].strip() if earliest < len(text) else text
+
+    # Tail markers — must appear *after* the body, not in the header.
+    # Search only past the first 1500 chars so the header "البحث في النظام"
+    # input doesn't match.
+    tail_anchors = [
+        "تم إضافة النظام للمفضلة",
+        "جميع الحقوق محفوظة",
+        "سياسة الخصوصية",
+        "شاركتكم",
+    ]
+    earliest_tail = len(body)
+    search_start = 1500
+    for needle in tail_anchors:
+        idx = body.find(needle, search_start)
+        if 0 <= idx < earliest_tail:
+            earliest_tail = idx
+    if earliest_tail < len(body):
+        body = body[:earliest_tail].strip()
+    # Strip inline BOE chrome that lives between the preamble and articles.
+    body = _CHROME_RE.sub("", body)
+    body = re.sub(r"\n{3,}", "\n\n", body)
+    return body.strip()
 
 
 def main() -> int:

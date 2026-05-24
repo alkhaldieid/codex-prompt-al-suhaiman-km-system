@@ -23,3 +23,20 @@ def can_send_to_openai(doc: OpenAIDocumentPolicySubject) -> tuple[bool, str | No
         return False, "restricted_matter"
     return True, None
 
+
+def subject_from_document(doc) -> OpenAIDocumentPolicySubject:
+    """Build a policy subject from a Document ORM instance."""
+    pii = doc.pii_flags
+    if isinstance(pii, str):
+        pii_list = [p for p in pii.split(",") if p]
+    else:
+        pii_list = list(pii or [])
+    return OpenAIDocumentPolicySubject(
+        source_track=doc.source_track.value
+        if hasattr(doc.source_track, "value")
+        else doc.source_track,
+        privilege_flag=bool(doc.privilege_flag),
+        pii_flags=pii_list,
+        visibility=doc.visibility or "firm_wide",
+    )
+

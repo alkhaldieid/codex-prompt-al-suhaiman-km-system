@@ -1,5 +1,5 @@
 {
-  "fetched_at_utc": "2026-05-23T18:50:32.583053+00:00",
+  "fetched_at_utc": "2026-05-24T07:20:54.871695+00:00",
   "source_base_url": "https://laws.boe.gov.sa",
   "items": [
     {
@@ -13,8 +13,8 @@
       ],
       "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/655fdb42-8c96-422b-b8c4-b04f0095c94c/1",
       "filename": "civil_transactions_law.txt",
-      "char_count": 207425,
-      "sha256": "1f93c39aec10332e16ec6bad46c72144f3caeccc453b1f9ad8e0b53a4f9ed526"
+      "char_count": 206345,
+      "sha256": "78d25d49ebcd8bdfecd7262a36c7e5c438c9e5b3fce7214b5e589e7c235db0bb"
     },
     {
       "slug": "labor_law",
@@ -25,8 +25,8 @@
       ],
       "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/08381293-6388-48e2-8ad2-a9a700f2aa94/1",
       "filename": "labor_law.txt",
-      "char_count": 180171,
-      "sha256": "91ab058625bfa8101084fe7cf3298d0b7ce906eaa6f486a928ca4586b92b3cf1"
+      "char_count": 179091,
+      "sha256": "f092dd1251b8b19c3597305a5b488bf728a986cec718128fdfa1dc71160100f3"
     },
     {
       "slug": "pdpl",
@@ -37,8 +37,8 @@
       ],
       "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/b7cfae89-828e-4994-b167-adaa00e37188/1",
       "filename": "pdpl.txt",
-      "char_count": 50586,
-      "sha256": "bb6271b22208d07fecfd7f764126aecfcd410fe0e606dbd4926d77b2a5d025c3"
+      "char_count": 49506,
+      "sha256": "cc260984db6ae37035b6cf0b37cb2da66cb5404af282163e66cb495f7d8cf60d"
     },
     {
       "slug": "aml_law",
@@ -51,8 +51,8 @@
       ],
       "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/0657dfce-95f8-463a-9d87-aa3900ec7b51/1",
       "filename": "aml_law.txt",
-      "char_count": 40519,
-      "sha256": "4ca69000ef0e3e56cd683a0bf1f2e598e1c9857cca7305b64c7c69485e952d24"
+      "char_count": 39439,
+      "sha256": "3d1ebdef88cae00a5928c51947840a088796b6ed2bb71eba49ea03170e71d93b"
     },
     {
       "slug": "companies_law",
@@ -64,8 +64,8 @@
       ],
       "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/a8376aea-1bc3-49d4-9027-aed900b555af/1",
       "filename": "companies_law.txt",
-      "char_count": 187264,
-      "sha256": "9182696ff18b21d459884d4aee1a315ca51cdd8f49d3f4ffba4bc25cdda39f08"
+      "char_count": 186184,
+      "sha256": "0d2a735c3d978bcddd8651183ad6cb7c65b1d0476bec72e926386f0ab7af63b9"
     },
     {
       "slug": "commercial_courts_law",
@@ -77,8 +77,8 @@
       ],
       "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/38334008-3b70-4c6c-b3af-aba3016a8061/1",
       "filename": "commercial_courts_law.txt",
-      "char_count": 40697,
-      "sha256": "a40b572a8538197574c9306ae540453d06b278cc0cc2a1ed0e102504e1f7b46f"
+      "char_count": 39617,
+      "sha256": "e9ea79fb68bf5593cff91c4524ac95755b0c0bf0bd9f7fa6d5e7b5eccbecbe95"
     }
   ]
 }

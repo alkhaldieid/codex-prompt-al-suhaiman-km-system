@@ -1,5 +1,19 @@
+"""Load fetched BOE law text into the canonical store as Track 1 docs.
+
+Replaces the prior placeholder seed (10 descriptive paragraphs about each
+regulator) with actual Saudi law text fetched by
+scripts/fetch_regulatory_corpus.py and committed under fixtures/regulatory/.
+
+Idempotency: keyed by content_hash_sha256 of the raw law text. Re-seeding
+across container restarts is a no-op once the corpus is loaded.
+"""
+
+from __future__ import annotations
+
 import hashlib
+import json
 import uuid
+from pathlib import Path
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -8,139 +22,76 @@ from app.models import Document, DocumentChunk, DocumentStatus, SourceTrack
 from app.services.text_processing import chunk_text, normalize_arabic
 
 
-REGULATORY_SEED_DOCUMENTS = [
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111101",
-        "title_ar": "هيئة الخبراء بمجلس الوزراء - قاعدة الأنظمة السعودية",
-        "doc_type": "regulation",
-        "source_url": "https://laws.boe.gov.sa/BoeLaws/Laws/",
-        "text": """
-        هيئة الخبراء بمجلس الوزراء تنشر قاعدة الأنظمة السعودية واللوائح والوثائق النظامية الرسمية.
-        هذا المصدر هو المرجع الأساسي للبحث في الأنظمة السعودية الصادرة بالأوامر والمراسيم والقرارات.
-        يستخدم النظام هذا المصدر لتتبع الأنظمة العامة مثل نظام المعاملات المدنية ونظام الشركات ونظام العمل والأنظمة التجارية والإجرائية.
-        عند اكتمال موصل الإنتاج، تحفظ كل وثيقة بنسخها وتواريخها وروابطها الرسمية وتفهرس موادها وفقراتها للاسترجاع الدلالي.
-        """,
-    },
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111102",
-        "title_ar": "جريدة أم القرى - الجريدة الرسمية للمملكة العربية السعودية",
-        "doc_type": "official_gazette",
-        "source_url": "https://www.uqn.gov.sa/",
-        "text": """
-        جريدة أم القرى هي الجريدة الرسمية التي تنشر الأنظمة واللوائح والقرارات الرسمية في المملكة العربية السعودية.
-        يعتمد نظام المعرفة على أم القرى لاكتشاف الإصدارات الجديدة والتعديلات فور نشرها رسمياً.
-        في الإنتاج، أي عدد جديد من الجريدة ينتج حدث تحديث يؤدي إلى استخراج الوثائق وربطها بالأنظمة القائمة وتحديث فهرس البحث.
-        """,
-    },
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111103",
-        "title_ar": "وزارة الموارد البشرية والتنمية الاجتماعية - نظام العمل واللوائح التنفيذية",
-        "doc_type": "regulation",
-        "source_url": "https://www.hrsd.gov.sa/",
-        "text": """
-        تغطي وزارة الموارد البشرية والتنمية الاجتماعية مجال العمل والتوظيف واللوائح التنفيذية لنظام العمل.
-        تشمل الموضوعات العملية عقود العمل، ساعات العمل، الإجازات، إنهاء العلاقة العمالية، تنظيم العمل، بيئة العمل، توظيف السعوديين، والاستقدام والخدمات العمالية.
-        عند سؤال المستخدم عن اللائحة التنفيذية لنظام العمل أو حقوق العامل أو التزامات صاحب العمل، يجب تفضيل هذا المصدر مع هيئة الخبراء وأم القرى.
-        """,
-    },
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111104",
-        "title_ar": "البنك المركزي السعودي - ساما: الأنظمة والتعاميم المصرفية",
-        "doc_type": "circular",
-        "source_url": "https://www.sama.gov.sa/",
-        "text": """
-        ينشر البنك المركزي السعودي ساما الأنظمة والتعليمات والتعاميم المتعلقة بالبنوك والتمويل والتأمين والمدفوعات ومكافحة غسل الأموال.
-        يستعمل النظام هذا المصدر للإجابة عن أسئلة القطاع المالي مثل عقوبات غسل الأموال، العناية الواجبة، الإبلاغ عن العمليات المشبوهة، تعليمات البنوك، وشركات التمويل.
-        يتم تحديث الفهرس عند ظهور تعميم أو قاعدة أو إعلان تنظيمي جديد.
-        """,
-    },
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111105",
-        "title_ar": "هيئة السوق المالية - اللوائح والقواعد التنفيذية",
-        "doc_type": "regulation",
-        "source_url": "https://cma.gov.sa/",
-        "text": """
-        تغطي هيئة السوق المالية قواعد السوق المالية، طرح الأوراق المالية، حوكمة الشركات، الإفصاح، الصناديق الاستثمارية، مؤسسات السوق المالية، والمخالفات والعقوبات.
-        يستخدم النظام هذا المصدر للأسئلة المتعلقة بالشركات المدرجة، الإفصاح المتأخر، المعلومات الجوهرية، الاستحواذ، والطرح العام.
-        """,
-    },
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111106",
-        "title_ar": "هيئة الزكاة والضريبة والجمارك - الأنظمة واللوائح الضريبية والزكوية",
-        "doc_type": "regulation",
-        "source_url": "https://zatca.gov.sa/",
-        "text": """
-        تنشر هيئة الزكاة والضريبة والجمارك الأنظمة واللوائح والأدلة المتعلقة بالزكاة، ضريبة القيمة المضافة، ضريبة الدخل، الجمارك، الفوترة الإلكترونية، والإجراءات الضريبية.
-        يستعمل النظام هذا المصدر عند السؤال عن الزكاة والضرائب والجمارك والامتثال الضريبي للشركات.
-        """,
-    },
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111107",
-        "title_ar": "الهيئة السعودية للبيانات والذكاء الاصطناعي - حماية البيانات والحوكمة",
-        "doc_type": "regulation",
-        "source_url": "https://sdaia.gov.sa/",
-        "text": """
-        تغطي سدايا ومكتب إدارة البيانات الوطنية موضوعات حماية البيانات الشخصية، حوكمة البيانات، مشاركة البيانات، والذكاء الاصطناعي.
-        يستخدم النظام هذا المصدر للأسئلة المتعلقة بنظام حماية البيانات الشخصية ولوائحه وسياسات البيانات الوطنية.
-        """,
-    },
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111108",
-        "title_ar": "الهيئة العامة للغذاء والدواء - اللوائح الفنية والتنظيمية",
-        "doc_type": "regulation",
-        "source_url": "https://www.sfda.gov.sa/",
-        "text": """
-        تنشر الهيئة العامة للغذاء والدواء اللوائح الفنية والتنظيمية المتعلقة بالغذاء والدواء والأجهزة الطبية ومستحضرات التجميل.
-        يستخدم النظام هذا المصدر للأسئلة الخاصة بالتسجيل والترخيص والمواصفات والالتزامات التنظيمية في قطاعات الغذاء والدواء والأجهزة الطبية.
-        """,
-    },
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111109",
-        "title_ar": "هيئة الاتصالات والفضاء والتقنية - تنظيم الاتصالات والتقنية",
-        "doc_type": "regulation",
-        "source_url": "https://www.cst.gov.sa/",
-        "text": """
-        تغطي هيئة الاتصالات والفضاء والتقنية تنظيم الاتصالات وتقنية المعلومات والمنصات الرقمية والطيف الترددي والخدمات البريدية والفضاء.
-        يستعمل النظام هذا المصدر للأسئلة المتعلقة بالتراخيص والالتزامات التنظيمية لمقدمي خدمات الاتصالات والتقنية.
-        """,
-    },
-    {
-        "doc_id": "11111111-1111-1111-1111-111111111110",
-        "title_ar": "منصة استطلاع - مشروعات الأنظمة واللوائح",
-        "doc_type": "draft_regulation",
-        "source_url": "https://istitlaa.ncc.gov.sa/",
-        "text": """
-        تنشر منصة استطلاع مشروعات الأنظمة واللوائح وما في حكمها قبل اعتمادها، وهي مصدر مهم لرصد التوجهات التنظيمية القادمة.
-        يجب تمييز محتوى استطلاع عن الأنظمة النافذة لأنه مسودة أو مشروع مطروح للمرئيات وليس بالضرورة نصاً ملزماً.
-        """,
-    },
+# fixtures/regulatory/ lives at repo root; backend runs in /app inside the
+# container with the repo mounted via the build context — fixtures got
+# copied in via `COPY . .` in the Dockerfile.
+FIXTURES_DIR_CANDIDATES = [
+    Path(__file__).resolve().parents[3] / "fixtures" / "regulatory",
+    Path("/app/fixtures/regulatory"),
+    Path("fixtures/regulatory"),
 ]
 
 
+def _fixtures_dir() -> Path | None:
+    for candidate in FIXTURES_DIR_CANDIDATES:
+        if (candidate / "manifest.json").exists():
+            return candidate
+    return None
+
+
+def _stable_doc_id(slug: str) -> uuid.UUID:
+    """Derive a deterministic UUID from the slug so re-seeding is idempotent
+    even if content_hash changes (e.g. BOE re-fetches with whitespace
+    differences)."""
+    return uuid.uuid5(uuid.NAMESPACE_URL, f"suhaiman-km://regulatory/{slug}")
+
+
 def seed_regulatory_corpus(db: Session) -> None:
-    for item in REGULATORY_SEED_DOCUMENTS:
-        exists = db.scalar(select(Document).where(Document.doc_id == item["doc_id"]))
-        if exists:
+    fixtures_dir = _fixtures_dir()
+    if fixtures_dir is None:
+        return
+
+    manifest = json.loads((fixtures_dir / "manifest.json").read_text(encoding="utf-8"))
+    for item in manifest["items"]:
+        slug = item["slug"]
+        doc_id = _stable_doc_id(slug)
+        text_path = fixtures_dir / item["filename"]
+        if not text_path.exists():
             continue
-        content_hash = hashlib.sha256(item["text"].encode("utf-8")).hexdigest()
+        body = text_path.read_text(encoding="utf-8")
+        content_hash = hashlib.sha256(body.encode("utf-8")).hexdigest()
+
+        existing = db.scalar(select(Document).where(Document.doc_id == doc_id))
+        if existing and existing.content_hash_sha256 == content_hash and existing.chunks:
+            continue
+        if existing:
+            # Hash changed (corpus was re-fetched) — drop old chunks/doc and
+            # rebuild so chunking changes propagate.
+            db.delete(existing)
+            db.flush()
+
         doc = Document(
-            doc_id=uuid.UUID(item["doc_id"]),
+            doc_id=doc_id,
             title_ar=item["title_ar"],
             doc_type=item["doc_type"],
+            practice_area=item.get("practice_area", []),
             jurisdiction="KSA",
             source_track=SourceTrack.track1_external,
             visibility="firm_wide",
             status=DocumentStatus.published,
             content_hash_sha256=content_hash,
-            storage_key=f"seed/{item['doc_id']}",
-            original_filename=f"{item['title_ar']}.txt",
+            storage_key=f"seed/{slug}",
+            original_filename=item["filename"],
             mime_type="text/plain",
             processing_stage="done",
-            status_detail_ar="مصدر تنظيمي رسمي مضاف إلى فهرس المعرفة",
-            extracted_text=item["text"].strip(),
+            status_detail_ar="مصدر تنظيمي رسمي من هيئة الخبراء، مفهرس للبحث",
+            extracted_text=body,
+            source_url=item.get("source_url"),
+            source_connector_id="boe_laws_v1",
         )
         db.add(doc)
-        for index, chunk in enumerate(chunk_text(item["text"]), start=1):
+
+        for index, chunk in enumerate(chunk_text(body), start=1):
             db.add(
                 DocumentChunk(
                     doc_id=doc.doc_id,
@@ -150,4 +101,5 @@ def seed_regulatory_corpus(db: Session) -> None:
                     paragraph_no=index,
                 )
             )
+
     db.commit()

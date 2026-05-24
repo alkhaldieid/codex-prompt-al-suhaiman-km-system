@@ -10,6 +10,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/sql/001_foundation.sql:/docker-entrypoint-initdb.d/001_foundation.sql:ro
+      - ./backend/sql/002_step1_embeddings.sql:/docker-entrypoint-initdb.d/002_step1_embeddings.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U suhaiman -d suhaiman_km"]
       interval: 5s
@@ -64,6 +65,9 @@ services:
       DATABASE_URL: postgresql+psycopg://suhaiman:suhaiman@postgres:5432/suhaiman_km
     ports:
       - "8000:8000"
+    volumes:
+      - ./fixtures:/app/fixtures:ro
+      - ./scripts:/app/scripts:ro
     depends_on:
       postgres:
         condition: service_healthy
