@@ -1,26 +1,32 @@
 """In-request ingestion pipeline (PoC sync path; pilot moves to Celery).
 
-Flow per spec §5.1:
-  1. extract text (pdfplumber/python-docx for now; OCR fallback added Step 4)
-  2. clean + paragraph-aware chunk per §6.1
-  3. persist chunks
-  4. embed in batches of 32 via the OpenAI gateway (preflight + audit)
-  5. flip status to pending_review
+Flow per spec §5.1 + §7.2:
+  1. extract text (pdfplumber / python-docx)
+  2. if PDF returned nothing → OCR fallback via GPT-5 vision
+  3. clean + paragraph-aware chunk per §6.1
+  4. persist chunks
+  5. autotag (doc_type, practice_area, confidence) via GPT-5 json_object
+  6. embed chunks in batches of 32 via the OpenAI gateway
+  7. bulk-index into OpenSearch
+  8. flip status to pending_review (or auto-publish if rules allow)
 
-If OPENAI_API_KEY is missing or LLM_REQUIRED=false, chunks are persisted
-without embeddings — searchable via BM25 only until backfill runs.
+If OPENAI_API_KEY is missing or LLM_REQUIRED=false, the OpenAI-dependent
+steps are skipped — text-only chunks are persisted and BM25-searchable.
 """
 
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.llm.policy import subject_from_document
 from app.models import Document, DocumentChunk, DocumentStatus
-from app.services.openai_gateway import OpenAIBlockedError, embed_texts_sync
+from app.services.autotag import autotag
+from app.services.openai_gateway import OpenAIBlockedError, embed_texts
+from app.services.pdf_ocr import ocr_pdf_if_needed
 from app.services.text_extraction import extract_text_from_upload
 from app.services.text_processing import chunk_text, clean_extracted_text, normalize_arabic
 
@@ -30,12 +36,9 @@ EMBED_BATCH_SIZE = 32
 
 
 def _embed_chunks(db: Session, doc: Document, chunks: list[DocumentChunk]) -> int:
-    """Embed any chunks that don't yet have a vector. Returns number embedded."""
     settings = get_settings()
     if not settings.openai_api_key:
-        logger.info("skip embeddings, no OPENAI_API_KEY")
         return 0
-
     subject = subject_from_document(doc)
     todo = [c for c in chunks if c.embedding is None]
     embedded = 0
@@ -43,11 +46,11 @@ def _embed_chunks(db: Session, doc: Document, chunks: list[DocumentChunk]) -> in
         batch = todo[start : start + EMBED_BATCH_SIZE]
         texts = [c.text_ar for c in batch]
         try:
-            vectors = embed_texts_sync(db, texts, subject=subject, doc_id=doc.doc_id)
+            vectors = embed_texts(db, texts, subject=subject, doc_id=doc.doc_id)
         except OpenAIBlockedError as exc:
             doc.status_detail_ar = (
-                "تم استخراج النص لكن سياسة العرض التجريبي منعت إرسال المقاطع إلى OpenAI "
-                f"(السبب: {exc.reason}). المقاطع متاحة للبحث النصي فقط."
+                "تم استخراج النص لكن سياسة العرض التجريبي منعت التضمين الدلالي "
+                f"(السبب: {exc.reason})."
             )
             return embedded
         for chunk, vector in zip(batch, vectors):
@@ -57,6 +60,32 @@ def _embed_chunks(db: Session, doc: Document, chunks: list[DocumentChunk]) -> in
     return embedded
 
 
+def _maybe_autotag(db: Session, doc: Document, chunks: list[DocumentChunk]) -> None:
+    settings = get_settings()
+    if not settings.openai_api_key or not chunks:
+        return
+    first_two_text = "\n\n".join(c.text_ar for c in chunks[:2])
+    tagging = autotag(
+        db,
+        title=doc.title_ar,
+        first_chunks_text=first_two_text,
+        subject=subject_from_document(doc),
+        doc_id=doc.doc_id,
+    )
+    if not tagging:
+        return
+    if tagging.get("doc_type"):
+        doc.doc_type = tagging["doc_type"]
+    if tagging.get("practice_area"):
+        doc.practice_area = tagging["practice_area"]
+    doc.auto_tag_confidence = {
+        "doc_type": tagging.get("doc_type_confidence", 0.0),
+        "practice_area": tagging.get("practice_area_confidence", 0.0),
+        "rationale_ar": tagging.get("rationale_ar", ""),
+    }
+    db.commit()
+
+
 def process_uploaded_document_inline(db: Session, *, doc: Document, content: bytes) -> None:
     doc.status = DocumentStatus.processing
     doc.processing_stage = "ocr"
@@ -64,14 +93,25 @@ def process_uploaded_document_inline(db: Session, *, doc: Document, content: byt
     db.flush()
 
     extracted_text = extract_text_from_upload(filename=doc.original_filename, content=content)
+
+    # Step 4: OCR fallback for PDFs where pdfplumber returned nothing.
+    if not extracted_text.strip() and Path(doc.original_filename).suffix.lower() == ".pdf":
+        doc.status_detail_ar = "النص غير قابل للاستخراج مباشرة؛ جاري OCR عبر GPT-5 vision"
+        db.flush()
+        extracted_text, ocr_pages = ocr_pdf_if_needed(
+            db,
+            pdf_bytes=content,
+            extracted_text=extracted_text,
+            subject=subject_from_document(doc),
+            doc_id=doc.doc_id,
+        )
+        if ocr_pages:
+            doc.ocr_metadata = {"engine": "gpt-5-vision", "pages": ocr_pages}
+
     if not extracted_text.strip():
-        # OCR fallback wired in Step 4. For now, save the file and surface
-        # status so the reviewer knows it needs OCR.
         doc.status = DocumentStatus.pending_review
         doc.processing_stage = "metadata"
-        doc.status_detail_ar = (
-            "تم حفظ الملف. لم يتم استخراج نص قابل للقراءة؛ يتطلب OCR."
-        )
+        doc.status_detail_ar = "تم حفظ الملف. لم يتم استخراج نص قابل للقراءة."
         doc.extracted_text = ""
         db.commit()
         return
@@ -88,19 +128,18 @@ def process_uploaded_document_inline(db: Session, *, doc: Document, content: byt
             chunk_index=index,
             text_ar=piece,
             text_normalized=normalize_arabic(piece),
-            page_no=None,
             paragraph_no=index,
-            char_start=None,
-            char_end=None,
         )
         chunks.append(chunk)
         db.add(chunk)
     db.flush()
 
+    # Autotag BEFORE embedding so the doc has its final practice_area/doc_type
+    # baked into the OS index.
+    _maybe_autotag(db, doc, chunks)
+
     embedded = _embed_chunks(db, doc, chunks)
 
-    # Index into OpenSearch (Step 2). Defer import to keep this path
-    # working even before the OS index exists.
     try:
         from app.services.search_index import index_chunks  # noqa: WPS433
 
@@ -110,8 +149,10 @@ def process_uploaded_document_inline(db: Session, *, doc: Document, content: byt
 
     doc.status = DocumentStatus.pending_review
     doc.processing_stage = "done"
-    detail_parts = [f"تم استخراج {len(chunks)} مقطعاً"]
+    detail = [f"تم استخراج {len(chunks)} مقطعاً"]
     if embedded:
-        detail_parts.append(f"وإنشاء {embedded} تضمين دلالي")
-    doc.status_detail_ar = "؛ ".join(detail_parts) + ". المستند جاهز للمراجعة."
+        detail.append(f"و{embedded} تضمين دلالي")
+    if doc.auto_tag_confidence:
+        detail.append("وتصنيف تلقائي")
+    doc.status_detail_ar = "؛ ".join(detail) + ". جاهز للمراجعة والاعتماد."
     db.commit()

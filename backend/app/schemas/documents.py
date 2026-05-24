@@ -24,8 +24,12 @@ class DocumentDetailResponse(BaseModel):
     title_ar: str
     status: str
     source_track: str
+    doc_type: str
+    practice_area: list[str]
     original_filename: str
     mime_type: str
     status_detail_ar: str
     extracted_text_preview: str
     chunk_count: int
+    auto_tag_confidence: dict | None = None
+    source_url: str | None = None

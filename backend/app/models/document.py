@@ -54,6 +54,7 @@ class Document(Base):
     source_connector_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     practice_area: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     auto_tag_confidence: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    ocr_metadata: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     summary_ar: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_by: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(

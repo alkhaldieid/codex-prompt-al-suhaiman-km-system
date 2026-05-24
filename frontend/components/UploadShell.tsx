@@ -2,9 +2,56 @@
 
 import { useMemo, useState } from "react";
 import { CheckCircle2, FileText, FileUp, Loader2, ShieldAlert } from "lucide-react";
-import { getDocument, getDocumentStatus, uploadDocument } from "@/lib/api";
+import { ConfidenceDot } from "@/components/ConfidenceDot";
+import { confirmDocument, getDocument, getDocumentStatus, uploadDocument } from "@/lib/api";
 
 const stages = ["جاري الرفع…", "قراءة المستند ضوئياً…", "استخلاص البيانات…", "الفهرسة…"];
+
+const DOC_TYPE_AR: Record<string, string> = {
+  judicial_ruling: "حكم قضائي",
+  legal_opinion: "رأي قانوني",
+  memo: "مذكرة",
+  pleading: "لائحة",
+  contract: "عقد",
+  engagement_letter: "خطاب ارتباط",
+  regulation: "لائحة تنظيمية",
+  royal_decree: "مرسوم ملكي",
+  council_resolution: "قرار مجلس الوزراء",
+  circular: "تعميم",
+  template: "نموذج",
+  precedent_note: "مذكرة سابقة",
+  other: "أخرى",
+};
+
+const PRACTICE_AREA_AR: Record<string, string> = {
+  corporate_commercial: "شركات وتجاري",
+  litigation_dispute: "تقاضي وتسوية نزاعات",
+  banking_finance: "مصرفي ومالي",
+  real_estate: "عقاري",
+  labor_employment: "عمل",
+  regulatory_compliance: "تنظيمي وامتثال",
+  ip: "ملكية فكرية",
+  tax_zakat: "ضريبي وزكوي",
+  construction: "تشييد ومقاولات",
+  family_inheritance: "أحوال شخصية وميراث",
+  criminal: "جزائي",
+  administrative: "إداري",
+};
+
+type DocDetail = {
+  doc_id: string;
+  title_ar: string;
+  doc_type: string;
+  practice_area: string[];
+  status: string;
+  chunk_count: number;
+  extracted_text_preview: string;
+  auto_tag_confidence: {
+    doc_type?: number;
+    practice_area?: number;
+    rationale_ar?: string;
+  } | null;
+};
 
 export function UploadShell() {
   const [file, setFile] = useState<File | null>(null);
@@ -13,10 +60,9 @@ export function UploadShell() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [docId, setDocId] = useState("");
-  const [statusLabel, setStatusLabel] = useState("");
-  const [preview, setPreview] = useState("");
-  const [chunkCount, setChunkCount] = useState<number | null>(null);
+  const [doc, setDoc] = useState<DocDetail | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [confirmToast, setConfirmToast] = useState("");
 
   const selectedFileLabel = useMemo(() => {
     if (!file) return "لم يتم اختيار ملف";
@@ -41,10 +87,8 @@ export function UploadShell() {
     setBusy(true);
     setError("");
     setMessage("");
-    setDocId("");
-    setStatusLabel("");
-    setPreview("");
-    setChunkCount(null);
+    setDoc(null);
+    setConfirmToast("");
     setStageIndex(0);
     const timer = window.setInterval(() => {
       setStageIndex((current) => Math.min(current + 1, stages.length - 1));
@@ -53,19 +97,32 @@ export function UploadShell() {
     try {
       const result = await uploadDocument(token, file, confirmed);
       const uploadedDocId = result.doc_id as string;
-      const status = await getDocumentStatus(token, uploadedDocId);
-      const document = await getDocument(token, uploadedDocId);
+      await getDocumentStatus(token, uploadedDocId);
+      const document = await getDocument(token, uploadedDocId) as DocDetail;
       setStageIndex(stages.length - 1);
-      setMessage(result.message_ar ?? "تم الرفع — ستستكمل المعالجة خلال أقل من دقيقتين");
-      setDocId(uploadedDocId);
-      setStatusLabel(status.stage_label_ar ?? "");
-      setPreview(document.extracted_text_preview ?? "");
-      setChunkCount(document.chunk_count ?? null);
+      setMessage(result.message_ar ?? "تم الرفع — راجع البيانات المستخلصة قبل الفهرسة.");
+      setDoc(document);
     } catch (err) {
       setError(err instanceof Error ? err.message : "تعذر رفع المستند");
     } finally {
       window.clearInterval(timer);
       setBusy(false);
+    }
+  }
+
+  async function confirmAndPublish() {
+    const token = window.localStorage.getItem("suhaiman_access_token");
+    if (!token || !doc) return;
+    setConfirming(true);
+    setError("");
+    try {
+      const result = await confirmDocument(token, doc.doc_id, {});
+      setConfirmToast(result.message_ar ?? "تم الحفظ والفهرسة — جاهز للبحث");
+      setDoc({...doc, status: result.status});
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "تعذر تأكيد المستند");
+    } finally {
+      setConfirming(false);
     }
   }
 
@@ -131,24 +188,95 @@ export function UploadShell() {
                 <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
                 {message}
               </div>
-              {docId ? (
-                <div className="mt-3 space-y-1 text-sm">
-                  <div dir="ltr" className="text-left">doc_id: {docId}</div>
-                  <div>الحالة: {statusLabel}</div>
-                  <div>عدد المقاطع: {chunkCount ?? 0}</div>
-                </div>
-              ) : null}
             </div>
           ) : null}
 
-          {preview ? (
+          {/* §8.2.4 Confirmation screen — auto-tagged fields, confidence dots,
+              one-click تأكيد وفهرسة promotion to published. */}
+          {doc && doc.status === "pending_review" ? (
+            <section className="mt-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+              <h2 className="mb-4 text-xl font-bold text-slate-950">تأكيد بيانات المستند</h2>
+              <dl className="space-y-4">
+                <div className="grid grid-cols-[140px_1fr] items-start gap-3">
+                  <dt className="font-semibold text-slate-700">العنوان</dt>
+                  <dd className="text-slate-900">{doc.title_ar}</dd>
+                </div>
+
+                <div className="grid grid-cols-[140px_1fr] items-start gap-3">
+                  <dt className="font-semibold text-slate-700">نوع المستند</dt>
+                  <dd>
+                    <div className="text-slate-900">{DOC_TYPE_AR[doc.doc_type] ?? doc.doc_type}</div>
+                    <ConfidenceDot value={doc.auto_tag_confidence?.doc_type} />
+                  </dd>
+                </div>
+
+                <div className="grid grid-cols-[140px_1fr] items-start gap-3">
+                  <dt className="font-semibold text-slate-700">مجال الممارسة</dt>
+                  <dd>
+                    <div className="flex flex-wrap gap-2 text-slate-900">
+                      {(doc.practice_area ?? []).length === 0 ? (
+                        <span className="text-slate-500">—</span>
+                      ) : (
+                        (doc.practice_area ?? []).map((pa) => (
+                          <span key={pa} className="rounded bg-slate-100 px-2 py-1 text-sm">{PRACTICE_AREA_AR[pa] ?? pa}</span>
+                        ))
+                      )}
+                    </div>
+                    <ConfidenceDot value={doc.auto_tag_confidence?.practice_area} />
+                  </dd>
+                </div>
+
+                <div className="grid grid-cols-[140px_1fr] items-start gap-3">
+                  <dt className="font-semibold text-slate-700">عدد المقاطع</dt>
+                  <dd className="text-slate-900">{doc.chunk_count}</dd>
+                </div>
+
+                {doc.auto_tag_confidence?.rationale_ar ? (
+                  <div className="rounded-md bg-slate-50 p-3 text-sm leading-7 text-slate-700">
+                    <span className="font-semibold">تعليل النموذج: </span>
+                    {doc.auto_tag_confidence.rationale_ar}
+                  </div>
+                ) : null}
+              </dl>
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={confirmAndPublish}
+                  disabled={confirming}
+                  className="rounded-md bg-accent px-5 py-3 font-semibold text-white hover:bg-accent-dark disabled:opacity-60"
+                >
+                  {confirming ? "جاري التأكيد…" : "تأكيد وفهرسة"}
+                </button>
+                <a href={`/documents/${doc.doc_id}`} className="rounded-md border border-slate-300 px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50">
+                  حفظ كمسودة
+                </a>
+              </div>
+            </section>
+          ) : null}
+
+          {confirmToast ? (
+            <div role="status" className="mt-4 rounded-lg bg-emerald-50 p-4 text-emerald-900">
+              <div className="flex items-center gap-2 font-semibold">
+                <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
+                {confirmToast}
+              </div>
+              <div className="mt-2 text-sm">
+                <a href={`/documents/${doc?.doc_id}`} className="underline hover:no-underline">فتح المستند</a>
+                {" • "}
+                <a href="/search" className="underline hover:no-underline">انتقل إلى البحث</a>
+              </div>
+            </div>
+          ) : null}
+
+          {doc?.extracted_text_preview ? (
             <section className="mt-6 rounded-lg border border-slate-200 bg-white p-4">
               <div className="mb-3 flex items-center gap-2 font-semibold text-slate-900">
                 <FileText className="h-5 w-5 text-accent-dark" aria-hidden="true" />
                 معاينة النص المستخرج
               </div>
               <p className="max-h-72 overflow-auto whitespace-pre-wrap font-textArabic text-lg leading-8 text-slate-800">
-                {preview}
+                {doc.extracted_text_preview}
               </p>
             </section>
           ) : null}

@@ -75,6 +75,26 @@ export async function getDocument(accessToken: string, docId: string) {
   return response.json();
 }
 
+export async function confirmDocument(
+  accessToken: string,
+  docId: string,
+  overrides: {title_ar?: string; doc_type?: string; practice_area?: string[]},
+) {
+  const response = await fetch(`${API_BASE}/documents/${docId}/confirm`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(overrides),
+  });
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null);
+    throw new Error(problem?.title ?? "تعذر تأكيد المستند");
+  }
+  return response.json();
+}
+
 export async function searchRegulations(accessToken: string, query: string) {
   const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`, {
     headers: {Authorization: `Bearer ${accessToken}`},
@@ -95,6 +115,22 @@ export async function askRegulations(accessToken: string, question: string) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({question}),
+  });
+  if (!response.ok) {
+    const problem = await response.json().catch(() => null);
+    throw new Error(problem?.title ?? "تعذر توليد الإجابة");
+  }
+  return response.json();
+}
+
+export async function askDocument(accessToken: string, docId: string, question: string) {
+  const response = await fetch(`${API_BASE}/documents/${docId}/ask`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({question, language: "ar"}),
   });
   if (!response.ok) {
     const problem = await response.json().catch(() => null);

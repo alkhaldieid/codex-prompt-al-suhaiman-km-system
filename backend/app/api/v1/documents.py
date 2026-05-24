@@ -160,12 +160,62 @@ def get_document(
         title_ar=doc.title_ar,
         status=doc.status.value,
         source_track=doc.source_track.value,
+        doc_type=doc.doc_type,
+        practice_area=doc.practice_area or [],
         original_filename=doc.original_filename,
         mime_type=doc.mime_type,
         status_detail_ar=doc.status_detail_ar,
         extracted_text_preview=doc.extracted_text[:1200],
         chunk_count=len(doc.chunks),
+        auto_tag_confidence=doc.auto_tag_confidence,
+        source_url=doc.source_url,
     )
+
+
+class ConfirmRequest(BaseModel):
+    title_ar: str | None = None
+    doc_type: str | None = None
+    practice_area: list[str] | None = None
+
+
+@router.post("/{doc_id}/confirm")
+def confirm_document(
+    doc_id: UUID,
+    payload: ConfirmRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    """Lawyer accepts the auto-tagged metadata (optionally with overrides)
+    and the document is promoted from pending_review to published."""
+    doc = db.get(Document, doc_id)
+    if doc is None:
+        raise AppProblem(
+            status=404,
+            title="المستند غير موجود",
+            detail="لا يوجد مستند بالمعرف المُقدَّم",
+            type_="https://ethka.dev/errors/document-not-found",
+        )
+    if payload.title_ar:
+        doc.title_ar = payload.title_ar
+    if payload.doc_type:
+        doc.doc_type = payload.doc_type
+    if payload.practice_area is not None:
+        doc.practice_area = payload.practice_area
+    doc.status = DocumentStatus.published
+    doc.status_detail_ar = "تم الحفظ والفهرسة — جاهز للبحث"
+    db.commit()
+    # Re-index into OpenSearch so the new metadata flows into BM25 filters.
+    try:
+        from app.services.search_index import index_chunks  # noqa: WPS433
+
+        index_chunks(doc, doc.chunks)
+    except Exception:  # noqa: BLE001
+        pass
+    return {
+        "doc_id": str(doc.doc_id),
+        "status": doc.status.value,
+        "message_ar": doc.status_detail_ar,
+    }
 
 
 class AskRequest(BaseModel):
