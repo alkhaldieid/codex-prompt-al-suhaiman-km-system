@@ -51,14 +51,70 @@ jobs:
         run: npx tsc --noEmit
 
   ai-quality-smoke:
+    # Per-PR gate. Runs the 5-query smoke benchmark against a backend
+    # spun up via docker-compose. Requires OPENAI_API_KEY secret.
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run AI smoke benchmark
+      - name: Boot stack (no LLM-dependent flag forced)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          cat > .env <<EOF
+          ENV=dev
+          LLM_REQUIRED=true
+          LLM_MODEL=gpt-5
+          EMBEDDINGS_MODEL=text-embedding-3-large
+          EMBEDDINGS_DIMENSIONS=1536
+          OCR_MODEL=gpt-5
+          DATABASE_URL=postgresql+psycopg://suhaiman:suhaiman@postgres:5432/suhaiman_km
+          OPENAI_API_KEY=${OPENAI_API_KEY}
+          EOF
+          docker compose up -d --build
+          for i in {1..60}; do
+            if curl -sf http://localhost:8000/api/v1/health > /dev/null; then break; fi
+            sleep 2
+          done
+      - name: Smoke benchmark (5 queries)
         run: python scripts/run_ai_quality.py --mode smoke
+
+  ai-quality-full:
+    # Full benchmark + faithfulness eval. Runs on push to main and
+    # nightly. Gates merges to main via branch protection on this job.
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'schedule'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Boot stack
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          cat > .env <<EOF
+          ENV=dev
+          LLM_REQUIRED=true
+          LLM_MODEL=gpt-5
+          EMBEDDINGS_MODEL=text-embedding-3-large
+          EMBEDDINGS_DIMENSIONS=1536
+          OCR_MODEL=gpt-5
+          DATABASE_URL=postgresql+psycopg://suhaiman:suhaiman@postgres:5432/suhaiman_km
+          OPENAI_API_KEY=${OPENAI_API_KEY}
+          EOF
+          docker compose up -d --build
+          for i in {1..60}; do
+            if curl -sf http://localhost:8000/api/v1/health > /dev/null; then break; fi
+            sleep 2
+          done
+      - name: Full retrieval benchmark (20 queries)
+        run: python scripts/run_ai_quality.py --mode full
+      - name: Faithfulness eval (20 Q/A pairs)
+        run: python scripts/run_rag_faithfulness.py
 
   security-scan:
     runs-on: ubuntu-latest
