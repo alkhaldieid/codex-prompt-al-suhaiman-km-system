@@ -1,22 +1,226 @@
 [
-  {"id": 1, "question": "ما عقوبة الإفصاح عن البيانات الشخصية الحساسة بقصد الإضرار بصاحبها؟", "expected_doc_id": "38b07687-e4a7-5be9-9b78-5f7368dd6743", "must_mention_any": ["السجن", "الغرامة", "ثلاثة ملايين", "سنتين"]},
-  {"id": 2, "question": "من هي الجهة المختصة بتطبيق نظام حماية البيانات الشخصية؟", "expected_doc_id": "38b07687-e4a7-5be9-9b78-5f7368dd6743", "must_mention_any": ["الجهة المختصة", "مجلس الوزراء"]},
-  {"id": 3, "question": "متى يجوز للدائن طلب فسخ العقد عند الإخلال بالالتزام؟", "expected_doc_id": "5f3f554c-2a8b-564a-84f8-b6666339dfe6", "must_mention_any": ["الإخلال", "الفسخ", "الإعذار", "الجوهر"]},
-  {"id": 4, "question": "ما هي شروط تأسيس شركة ذات مسؤولية محدودة؟", "expected_doc_id": "f6f3421b-34bd-57b4-99e7-75e1ffac1296", "must_mention_any": ["الشركاء", "رأس المال", "العقد", "النظام الأساسي"]},
-  {"id": 5, "question": "ما واجبات صاحب العمل في نظام العمل؟", "expected_doc_id": "f4a2681c-7aa6-5cda-af08-523d28686276", "must_mention_any": ["العامل", "الأجر", "العمل"]},
-  {"id": 6, "question": "ما العقوبة على من يقوم بعملية غسل أموال؟", "expected_doc_id": "a48e44dd-5b08-5ba2-8773-1213c07b4e12", "must_mention_any": ["السجن", "الغرامة", "غسل"]},
-  {"id": 7, "question": "كيف يتم الاستئناف على حكم المحكمة التجارية؟", "expected_doc_id": "bc4a09f2-5296-5747-996e-a2185293a7fc", "must_mention_any": ["الاستئناف", "المحكمة"]},
-  {"id": 8, "question": "ما الحالات التي تستوجب إعادة النظر في الأحكام التجارية؟", "expected_doc_id": "bc4a09f2-5296-5747-996e-a2185293a7fc", "must_mention_any": ["إعادة النظر", "الحكم", "المحكمة"]},
-  {"id": 9, "question": "هل يجوز نقل البيانات الشخصية إلى خارج المملكة؟", "expected_doc_id": "38b07687-e4a7-5be9-9b78-5f7368dd6743", "must_mention_any": ["نقل", "خارج", "المملكة"]},
-  {"id": 10, "question": "ما هي ساعات العمل المسموح بها في نظام العمل؟", "expected_doc_id": "f4a2681c-7aa6-5cda-af08-523d28686276", "must_mention_any": ["ساعة", "ساعات", "اليوم", "الأسبوع"]},
-  {"id": 11, "question": "ما هي الإجازات السنوية المستحقة للعامل؟", "expected_doc_id": "f4a2681c-7aa6-5cda-af08-523d28686276", "must_mention_any": ["الإجازة", "السنوية", "العامل"]},
-  {"id": 12, "question": "متى ينقضي الالتزام بالاستحالة؟", "expected_doc_id": "5f3f554c-2a8b-564a-84f8-b6666339dfe6", "must_mention_any": ["الاستحالة", "الالتزام", "ينقضي"]},
-  {"id": 13, "question": "ما المقصود بالعناية الواجبة في نظام غسل الأموال؟", "expected_doc_id": "a48e44dd-5b08-5ba2-8773-1213c07b4e12", "must_mention_any": ["العناية", "الواجبة"]},
-  {"id": 14, "question": "ما واجبات المؤسسات المالية تجاه العمليات المشبوهة؟", "expected_doc_id": "a48e44dd-5b08-5ba2-8773-1213c07b4e12", "must_mention_any": ["مشبوهة", "الإبلاغ", "المالية"]},
-  {"id": 15, "question": "كيف يتم تحويل الشركات بين أشكالها القانونية؟", "expected_doc_id": "f6f3421b-34bd-57b4-99e7-75e1ffac1296", "must_mention_any": ["التحول", "الشركة", "الشكل"]},
-  {"id": 16, "question": "ما حقوق صاحب البيانات الشخصية؟", "expected_doc_id": "38b07687-e4a7-5be9-9b78-5f7368dd6743", "must_mention_any": ["صاحب البيانات", "الحق", "الاطلاع"]},
-  {"id": 17, "question": "ما المقصود بالإخلال الجوهري في العقد؟", "expected_doc_id": "5f3f554c-2a8b-564a-84f8-b6666339dfe6", "must_mention_any": ["الإخلال", "الجوهر", "العقد"]},
-  {"id": 18, "question": "ما اختصاصات المحاكم التجارية؟", "expected_doc_id": "bc4a09f2-5296-5747-996e-a2185293a7fc", "must_mention_any": ["المحاكم التجارية", "الاختصاص"]},
-  {"id": 19, "question": "ما هي العقوبة على نشر بيانات شخصية بدون موافقة؟", "expected_doc_id": "38b07687-e4a7-5be9-9b78-5f7368dd6743", "must_mention_any": ["العقوبة", "السجن", "الغرامة"]},
-  {"id": 20, "question": "كيف يحسب رأس المال في الشركات المساهمة؟", "expected_doc_id": "f6f3421b-34bd-57b4-99e7-75e1ffac1296", "must_mention_any": ["رأس المال", "الأسهم", "المساهمة"]}
+  {
+    "id": 1,
+    "question": "ما اختصاصات المحاكم التجارية؟",
+    "expected_doc_id": "a4b60a42-a91a-485d-8de1-eac0692dbf25",
+    "must_mention_any": [
+      "المحاكم التجارية",
+      "الاختصاص",
+      "المنازعات"
+    ],
+    "notes": "Commercial Courts Law"
+  },
+  {
+    "id": 2,
+    "question": "كيف يتم تبليغ الخصوم في الدعاوى التجارية بالطرق الإلكترونية؟",
+    "expected_doc_id": "a4b60a42-a91a-485d-8de1-eac0692dbf25",
+    "must_mention_any": [
+      "البريد الإلكتروني",
+      "الرسائل النصية",
+      "التبليغ"
+    ],
+    "notes": "Commercial Courts Law"
+  },
+  {
+    "id": 3,
+    "question": "ما الوسائل المقبولة للإثبات الإلكتروني وفق نظام الإثبات؟",
+    "expected_doc_id": "867715eb-97ae-40a4-a550-ac665b6aacb7",
+    "acceptable_doc_ids": [
+      "867715eb-97ae-40a4-a550-ac665b6aacb7",
+      "a4b60a42-a91a-485d-8de1-eac0692dbf25",
+      "b145ac43-cd65-4a6f-9337-450a755aeb48"
+    ],
+    "must_mention_any": [
+      "الإلكتروني",
+      "المحرر",
+      "الدليل"
+    ],
+    "notes": "Evidence Law (electronic evidence also covered by Commercial Courts Law and Notarization Implementing)"
+  },
+  {
+    "id": 4,
+    "question": "متى تأخذ المحكمة برأي الخبير في نظام الإثبات؟",
+    "expected_doc_id": "867715eb-97ae-40a4-a550-ac665b6aacb7",
+    "acceptable_doc_ids": [
+      "867715eb-97ae-40a4-a550-ac665b6aacb7",
+      "d83eb559-bd5b-45e4-828d-d29d20d6fd9e"
+    ],
+    "must_mention_any": [
+      "الخبير",
+      "المحكمة"
+    ],
+    "notes": "Evidence Law (expert testimony also covered by Sharia Procedure Law)"
+  },
+  {
+    "id": 5,
+    "question": "ما حجية شهادة الشهود في نظام الإثبات؟",
+    "expected_doc_id": "867715eb-97ae-40a4-a550-ac665b6aacb7",
+    "must_mention_any": [
+      "الشهادة",
+      "الشاهد"
+    ],
+    "notes": "Evidence Law"
+  },
+  {
+    "id": 6,
+    "question": "ما إجراءات الاستئناف على الأحكام التجارية وفق نظام المحاكم التجارية؟",
+    "expected_doc_id": "a4b60a42-a91a-485d-8de1-eac0692dbf25",
+    "acceptable_doc_ids": [
+      "a4b60a42-a91a-485d-8de1-eac0692dbf25",
+      "494d5b0c-5765-4a99-b4aa-b3216910b567"
+    ],
+    "must_mention_any": [
+      "الاستئناف",
+      "المحكمة"
+    ],
+    "notes": "Commercial Courts Law (appeal procedure shared with Appellate Procedure Implementing). Question disambiguated by naming the law."
+  },
+  {
+    "id": 7,
+    "question": "ما إجراءات نزع ملكية العقار للمنفعة العامة؟",
+    "expected_doc_id": "8e0a5878-af03-48e0-a87d-80f9c99b20a7",
+    "must_mention_any": [
+      "نزع",
+      "المنفعة",
+      "العقار"
+    ],
+    "notes": "Expropriation"
+  },
+  {
+    "id": 8,
+    "question": "ما حقوق الحدث الموقوف وفق نظام الأحداث؟",
+    "expected_doc_id": "e27546de-1bb7-49ac-8865-41b36dbf2f67",
+    "must_mention_any": [
+      "الحدث",
+      "الحقوق"
+    ],
+    "notes": "Juveniles Law"
+  },
+  {
+    "id": 9,
+    "question": "ما عقوبة الإرهاب وتمويله؟",
+    "expected_doc_id": "ec416ebd-c3fa-4679-b0e9-c2e90885c85a",
+    "must_mention_any": [
+      "السجن",
+      "العقوبة"
+    ],
+    "notes": "Counter-Terrorism"
+  },
+  {
+    "id": 10,
+    "question": "ما الواجبات المهنية للمحامي؟",
+    "expected_doc_id": "fe316b28-981e-42a6-8b4c-e5aaa46d0a01",
+    "must_mention_any": [
+      "المحامي",
+      "الواجب"
+    ],
+    "notes": "Lawyer Code"
+  },
+  {
+    "id": 11,
+    "question": "متى يحق للمتهم محامٍ على نفقة الدولة؟",
+    "expected_doc_id": "3042f900-9b13-496c-aabd-1d7604567149",
+    "acceptable_doc_ids": [
+      "3042f900-9b13-496c-aabd-1d7604567149",
+      "54680a8d-c74c-42c6-b317-d778d9f57894"
+    ],
+    "must_mention_any": [
+      "محام",
+      "الدولة"
+    ],
+    "notes": "Public Defender (right also defined in Criminal Procedure Implementing)"
+  },
+  {
+    "id": 12,
+    "question": "ما إجراءات التنفيذ على المدين في الأحكام القضائية؟",
+    "expected_doc_id": "f9d20d8e-56d8-4cdd-8dd6-3419cb392777",
+    "must_mention_any": [
+      "التنفيذ",
+      "المدين"
+    ],
+    "notes": "Enforcement Implementing"
+  },
+  {
+    "id": 13,
+    "question": "ما إجراءات توثيق العقود لدى كاتب العدل؟",
+    "expected_doc_id": "3fbab521-3c31-4e16-9a49-77062fdeae63",
+    "must_mention_any": [
+      "التوثيق",
+      "كاتب العدل"
+    ],
+    "notes": "Notarization Law"
+  },
+  {
+    "id": 14,
+    "question": "ما إجراءات التسجيل العيني للعقار؟",
+    "expected_doc_id": "95d22cd2-3429-41f1-9e59-3e51a24f0afa",
+    "must_mention_any": [
+      "التسجيل",
+      "العقار"
+    ],
+    "notes": "Real Estate Registration"
+  },
+  {
+    "id": 15,
+    "question": "ما أحكام الرهن العقاري المسجل؟",
+    "expected_doc_id": "9f83a3fb-0812-4cbb-9aad-cba7e5069ed3",
+    "must_mention_any": [
+      "الرهن",
+      "العقار"
+    ],
+    "notes": "Real Estate Mortgage"
+  },
+  {
+    "id": 16,
+    "question": "كيف تتم قسمة الأموال المشتركة؟",
+    "expected_doc_id": "afbd17a7-af5b-4382-add5-f366b56ad4ae",
+    "must_mention_any": [
+      "القسمة",
+      "الأموال"
+    ],
+    "notes": "Common Property Division"
+  },
+  {
+    "id": 17,
+    "question": "ما إجراءات صندوق النفقة؟",
+    "expected_doc_id": "60535d13-2523-400d-8882-053b1ce2dae1",
+    "must_mention_any": [
+      "النفقة",
+      "الصندوق"
+    ],
+    "notes": "Maintenance Fund"
+  },
+  {
+    "id": 18,
+    "question": "ما حقوق ملكية الوحدات العقارية المشتركة؟",
+    "expected_doc_id": "0dff78ac-7ce5-4cc3-8d82-83f8fb59d9cc",
+    "must_mention_any": [
+      "الوحدات",
+      "العقارية"
+    ],
+    "notes": "Condominium"
+  },
+  {
+    "id": 19,
+    "question": "كيف يتم تسليم المؤجر للأصول المنقولة؟",
+    "expected_doc_id": "e0e1b2b3-46ac-4354-9a41-5a0215047f65",
+    "must_mention_any": [
+      "المؤجر",
+      "الأصول"
+    ],
+    "notes": "Lessor Asset Recovery"
+  },
+  {
+    "id": 20,
+    "question": "ما إجراءات الاستئناف في القضايا الجزائية؟",
+    "expected_doc_id": "494d5b0c-5765-4a99-b4aa-b3216910b567",
+    "acceptable_doc_ids": [
+      "494d5b0c-5765-4a99-b4aa-b3216910b567",
+      "54680a8d-c74c-42c6-b317-d778d9f57894"
+    ],
+    "must_mention_any": [
+      "الاستئناف"
+    ],
+    "notes": "Appellate Procedure Implementing (criminal appeal procedure also defined in Criminal Procedure Implementing)"
+  }
 ]

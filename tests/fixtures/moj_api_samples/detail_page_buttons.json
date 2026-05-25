@@ -1,0 +1,2592 @@
+[
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar",
+    "cls": "nuxt-link-active"
+  },
+  {
+    "tag": "A",
+    "text": "الأنظمة العدلية",
+    "aria": "",
+    "href": "/ar/legislations-regulations?type=1",
+    "cls": "nav-link active"
+  },
+  {
+    "tag": "A",
+    "text": "الأحكام القضائية",
+    "aria": "",
+    "href": "/ar/JudicialDecisionsList/1",
+    "cls": "nav-link"
+  },
+  {
+    "tag": "A",
+    "text": "المصطلحات",
+    "aria": "",
+    "href": "/ar/dictionaries",
+    "cls": "nav-link"
+  },
+  {
+    "tag": "A",
+    "text": "الدخول",
+    "aria": "",
+    "href": "#",
+    "cls": "nav-link"
+  },
+  {
+    "tag": "BUTTON",
+    "text": "الدخول",
+    "aria": "",
+    "href": "",
+    "cls": "btn login-btn"
+  },
+  {
+    "tag": "A",
+    "text": "عربي",
+    "aria": "",
+    "href": "#",
+    "cls": "nav-link dropdown-toggle nav-link-custom dropdown-toggle-no-caret"
+  },
+  {
+    "tag": "A",
+    "text": "English",
+    "aria": "",
+    "href": "#",
+    "cls": "dropdown-item"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/",
+    "cls": "nuxt-link-active"
+  },
+  {
+    "tag": "A",
+    "text": "الأنظمة واللوائح التنفيذية",
+    "aria": "",
+    "href": "/legislations-regulations",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "الرجوع لقائمة التشريعات",
+    "aria": "",
+    "href": "",
+    "cls": "btn-back my-2"
+  },
+  {
+    "tag": "BUTTON",
+    "text": "En",
+    "aria": "",
+    "href": "",
+    "cls": "btn btn-warning btn-icon-small mx-2"
+  },
+  {
+    "tag": "BUTTON",
+    "text": "تصدير إلى PDF",
+    "aria": "",
+    "href": "",
+    "cls": "btn btn-primary btn-pdf"
+  },
+  {
+    "tag": "A",
+    "text": "اضغط هنا",
+    "aria": "",
+    "href": "https://laws.boe.gov.sa/BoeLaws/Laws/LawDetails/2716057c-c097-4bad-8e1e-ae1400c678d5/1",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "ضوابط إجراءات الإثبات إلكترونياً",
+    "aria": "",
+    "href": "/ar/legislation/4MlQ7qXft074z0DphE_Zmw",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "الأدلة الإجرائية لنظام الإثبات",
+    "aria": "",
+    "href": "/ar/legislation/ZNMI0PpA1fSRgK60lVLGEw",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "القواعد الخاصة بتنظيم شؤون الخبرة أمام المحاكم",
+    "aria": "",
+    "href": "/ar/legislation/IVuNhqeASR-irehY2BPMag",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "اخفاء جدول المحتوى",
+    "aria": "",
+    "href": "javascript:void()",
+    "cls": "toggler-table ."
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "/ar/legislation/null",
+    "cls": "font-regular"
+  },
+  {
+    "tag": "A",
+    "text": "الباب الأول أحكام عامة",
+    "aria": "أحكام عامة",
+    "href": "#content-card-oUkzeLESZ4hz0tWQmH5Hog",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الأولى",
+    "aria": "",
+    "href": "#content-card-aP7YgWG63RZpZkFx8lWC5A",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية",
+    "aria": "",
+    "href": "#content-card-XqG9lJov6vgwli7wb6YYiQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة",
+    "aria": "",
+    "href": "#content-card-XGSKXAJDa4Xyt8SVFSGESg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة",
+    "aria": "",
+    "href": "#content-card-T-FYupdwkCaGz-DCXFEBXQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة",
+    "aria": "",
+    "href": "#content-card-s_PlrmNm04efGRrh1ucCnw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة",
+    "aria": "",
+    "href": "#content-card-bkeZARZwg7BKWGDEJzOO6g",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة",
+    "aria": "",
+    "href": "#content-card-DyyfFbQ2in9TXZMLa8olqg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة",
+    "aria": "",
+    "href": "#content-card-hRhQmhSeGOEVcBI7UXMzgg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة",
+    "aria": "",
+    "href": "#content-card-vjYoyUuOFiut3rK2zcYEhg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة العاشرة",
+    "aria": "",
+    "href": "#content-card-fvf8cl-rhoq6gZnxGe-QUg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية عشرة",
+    "aria": "",
+    "href": "#content-card-60kwocO4OVYQGl8Bkcsfxw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية عشرة",
+    "aria": "",
+    "href": "#content-card-gEot11u63A2d6CApFyZUxg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة عشرة",
+    "aria": "",
+    "href": "#content-card-EQVcYhfDYsoaGpE4A28ccA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب الثاني الإقرار واستجواب الخصوم",
+    "aria": "الإقرار واستجواب الخصوم",
+    "href": "#content-card-7WQ-t3jQXTmJvsejvzZ58Q",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الأول الإقرار",
+    "aria": "الإقرار",
+    "href": "#content-card-0fxYgTCr35bPflVpVSJgGw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة عشرة",
+    "aria": "",
+    "href": "#content-card-mHxEUd3NQKTbmrANzreKxg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة عشرة",
+    "aria": "",
+    "href": "#content-card-WqWvQLqGAwbWjWdBcA-Cvg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة عشرة",
+    "aria": "",
+    "href": "#content-card-9S5s6rQspMK51w7N-iPRGQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة عشرة",
+    "aria": "",
+    "href": "#content-card-CnhedGefrbh1KhdYzLZk8g",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة عشرة",
+    "aria": "",
+    "href": "#content-card-5vL65Xiw14L9owwW4RIpWA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة عشرة",
+    "aria": "",
+    "href": "#content-card-3KZOyvwiSKdgru8bb2dpoA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الثاني استجواب الخصوم",
+    "aria": "استجواب الخصوم",
+    "href": "#content-card-Q_jP4Bw0__PMb0U_uImeeg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة العشرون",
+    "aria": "",
+    "href": "#content-card-PZ3WGFHxuf9lGZ9T64PmTQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية والعشرون",
+    "aria": "",
+    "href": "#content-card-Qct0uuFfnp6irVM8EIXoxQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية والعشرون",
+    "aria": "",
+    "href": "#content-card-64mLW1uuF5nzwqRJljzm8w",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة والعشرون",
+    "aria": "",
+    "href": "#content-card-1iA6h3NjwSmL-CysOXdn3w",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة والعشرون",
+    "aria": "",
+    "href": "#content-card-sirzUdHjCK3iughAfUpvHw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب الثالث الكتابة",
+    "aria": "الكتابة",
+    "href": "#content-card-M9-l91N7400t2Mfp81M5XQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الأول المحررات الرسمية",
+    "aria": "المحررات الرسمية",
+    "href": "#content-card-Eud4VPoAd4wkAMnGDPwLcg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة والعشرون",
+    "aria": "",
+    "href": "#content-card-AmAOlA2SLDRvbXmd1rK29Q",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة والعشرون",
+    "aria": "",
+    "href": "#content-card-yRlgXOVa-b8G5xFzMLmSFQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة والعشرون",
+    "aria": "",
+    "href": "#content-card--7vaBxdan2YGl6TQXsxilQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة والعشرون",
+    "aria": "",
+    "href": "#content-card-2XrrLjIIqiUEZ80KBCbu5w",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الثاني المحرَّرات العادية",
+    "aria": "المحرَّرات العادية",
+    "href": "#content-card-BAaxrGzPi_1xTexHB24QBA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة والعشرون",
+    "aria": "",
+    "href": "#content-card-pP0nvR8KCG7OJ3Lm9qAIQw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثلاثون",
+    "aria": "",
+    "href": "#content-card-R7dx9ObAux-WDqcR2CxIkA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية والثلاثون",
+    "aria": "",
+    "href": "#content-card-JJt9xZuWop6GDLQMcyW3Kw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية والثلاثون",
+    "aria": "",
+    "href": "#content-card-oMr-vskaYqtYeMYCh8DobA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة والثلاثون",
+    "aria": "",
+    "href": "#content-card-ZPauaZWziXH1ghxe3OeW4w",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الثالث طلب إلزام الخصم بتقديم المحرَّرات الموجودة تحت يده",
+    "aria": "طلب إلزام الخصم بتقديم المحرَّرات الموجودة تحت يده",
+    "href": "#content-card-PDYyHDEePByJTgnsxZF_9w",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة والثلاثون",
+    "aria": "",
+    "href": "#content-card-gw7IUmKwE_jP_KtxCLIeQw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة والثلاثون",
+    "aria": "",
+    "href": "#content-card-IxyTfhFscuw7BH368sbcaQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة والثلاثون",
+    "aria": "",
+    "href": "#content-card-UnnoW8XAiWk5Z15PYall_A",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة والثلاثون",
+    "aria": "",
+    "href": "#content-card-EIE_KIROoNeZeG0H4w5T9g",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الرابع: إثبات صحة المحرَّرات       الفرع الأول: أحكام عامة",
+    "aria": "الفرع الأول: أحكام عامة",
+    "href": "#content-card-hnXI32SfxRKqultpk02D1g",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة والثلاثون",
+    "aria": "",
+    "href": "#content-card-3H9OJRWYreRjPU_iIm6ErQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة والثلاثون",
+    "aria": "",
+    "href": "#content-card-o_I_O8FdWN0N0w4M9tbDPg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الرابع: إثبات صحة المحرَّرات       الفرع الثاني: إنكار الخط أو الإمضاء أو ",
+    "aria": "الفرع الثاني: إنكار الخط أو الإمضاء أو الختم أو البصمة، وتحقيق الخطوط",
+    "href": "#content-card-xuKBXD30UZwqLzh0FtganA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الأربعون",
+    "aria": "",
+    "href": "#content-card-xHHfap2S4z568B5AimwVmg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية والأربعون",
+    "aria": "",
+    "href": "#content-card-35JUy3lhLBvGunxXJob0eQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية والأربعون",
+    "aria": "",
+    "href": "#content-card-PViKQ05w-jk6PvswFEwwCA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة والأربعون",
+    "aria": "",
+    "href": "#content-card-12Dy3mxokslx5ibqfMYDbQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الرابع: إثبات صحة المحرَّرات       الفرع الثالث: الادعاء بالتزوير",
+    "aria": "الفرع الثالث: الادعاء بالتزوير",
+    "href": "#content-card-sVH8x2zlrqh0WGpNWrawYQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة والأربعون",
+    "aria": "",
+    "href": "#content-card-0fGg6tN6xCIS-ZLniqJXqg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة والأربعون",
+    "aria": "",
+    "href": "#content-card-nkSmTuZ1JpKdw5bPwf2WIA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة والأربعون",
+    "aria": "",
+    "href": "#content-card-GxKnKE51UH8ssMGVAYgptw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة والأربعون",
+    "aria": "",
+    "href": "#content-card-XWkihRlB0h6ebulsBuvGyw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة والأربعون",
+    "aria": "",
+    "href": "#content-card-G1ifJwN-Iugq6KlXCzeeEg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة والأربعون",
+    "aria": "",
+    "href": "#content-card-h4TxVUsZzDvOB4yTwt-rrQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الرابع: إثبات صحة المحرَّرات       الفرع الرابع: دعوى التزوير الأصلية",
+    "aria": "الفرع الرابع: دعوى التزوير الأصلية",
+    "href": "#content-card-g69gQZRAXYqRbyAFxSCE-g",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخمسون",
+    "aria": "",
+    "href": "#content-card-9CvVjt6Wtuwx3Wh_rskA6Q",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الخامس  أحكام ختامية في الكتابة",
+    "aria": " أحكام ختامية في الكتابة",
+    "href": "#content-card-Nic6tDzE5FsYA-2QkoCACA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية والخمسون",
+    "aria": "",
+    "href": "#content-card-ipy149dYCC4GvU-Q9nFhIw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية والخمسون",
+    "aria": "",
+    "href": "#content-card-fWNKgAPULG1hn7jXU_CI0A",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب الرابع  الدليل الرقمي",
+    "aria": "الدليل الرقمي",
+    "href": "#content-card-Ra7HkpSMDdU4dbflkFv2iw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة والخمسون",
+    "aria": "",
+    "href": "#content-card-TZZin6N4l0vTxS-ZWfEzKg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة والخمسون",
+    "aria": "",
+    "href": "#content-card-LH25gJ8oVvvhyLCUPG26AQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة والخمسون",
+    "aria": "",
+    "href": "#content-card-YCSCYBnoEuUy0z11OLENEg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة والخمسون",
+    "aria": "",
+    "href": "#content-card-OhcLdk7Ym2a72KK3ASIhQQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة والخمسون",
+    "aria": "",
+    "href": "#content-card-IUF6XGpbE76H7l2mui7bTw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة والخمسون",
+    "aria": "",
+    "href": "#content-card-W6QVx4TU25WbebIMlznyoQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة والخمسون",
+    "aria": "",
+    "href": "#content-card-tDE2fGUdDowxsTx-guQbuQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الستون",
+    "aria": "",
+    "href": "#content-card-YSWKTgUfFFvbQpxIoKgPig",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية والستون",
+    "aria": "",
+    "href": "#content-card-ES0r6jPRzyGW_6gZvAlHdg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية والستون",
+    "aria": "",
+    "href": "#content-card-AMvPzGPsURF7nO8dMILFAA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة والستون",
+    "aria": "",
+    "href": "#content-card-NPnOZPYnwKT6lgMCNs44Ag",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة والستون",
+    "aria": "",
+    "href": "#content-card-oSAcSyiZUw4o_HGA_LJNWA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب الخامس الشهادة",
+    "aria": "الشهادة",
+    "href": "#content-card-Sm8_0XUs6cG8Ge68d8FMsQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الأول محل الشهادة",
+    "aria": "محل الشهادة",
+    "href": "#content-card-RGYBzWXj2mNz3mb1g3eQkw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة والستون",
+    "aria": "",
+    "href": "#content-card-6ZHUlv7x0BOnYJG-pLBEdw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة والستون",
+    "aria": "",
+    "href": "#content-card-VxM_jLwUKyvgGLQf1EDz8g",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة والستون",
+    "aria": "",
+    "href": "#content-card-aA_qVqf-oYWzr4yqLdpy2Q",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة والستون",
+    "aria": "",
+    "href": "#content-card-hsFUkvSFIpyxd4hv0fpNyg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة والستون",
+    "aria": "",
+    "href": "#content-card-ftuZ9n99qiXRuUZSwU1lVQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الثاني شروط الشهادة وموانعها",
+    "aria": "شروط الشهادة وموانعها",
+    "href": "#content-card-oP2kIyV7Zvj02uzZ0EnM1g",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السبعون",
+    "aria": "",
+    "href": "#content-card-JiIqJUyqE7BHJ11Q437QDA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية والسبعون",
+    "aria": "",
+    "href": "#content-card-EFu6HOnfyUMQyMVFzud2Lg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الثالث إجراءات الإثبات بالشهادة",
+    "aria": "إجراءات الإثبات بالشهادة",
+    "href": "#content-card-UFipiobpSxS9wMBKkhCuFg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية والسبعون",
+    "aria": "",
+    "href": "#content-card-wIGnJxvzN6yMDPB4GuT-qw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة والسبعون",
+    "aria": "",
+    "href": "#content-card-axV-cIttDrQYEWIRQe8aHg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة والسبعون",
+    "aria": "",
+    "href": "#content-card-klb-mKX6rLVyQa5n1gIIng",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة والسبعون",
+    "aria": "",
+    "href": "#content-card-olMxJbPYZEtJ2np5oHdfUQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة والسبعون",
+    "aria": "",
+    "href": "#content-card-crbuenAr5zyW3jIm0aFQug",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة والسبعون",
+    "aria": "",
+    "href": "#content-card-36THbQ9IIJeviAgo-aT8yw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة والسبعون",
+    "aria": "",
+    "href": "#content-card-T6JtpMz8ClfGsylr_KrHJA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة والسبعون",
+    "aria": "",
+    "href": "#content-card-IhRok2afRATPkksqmaiDwg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثمانون",
+    "aria": "",
+    "href": "#content-card-GtMkUyb0SIHNdRejz-YqpA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الرابع  الدعوى المستعجلة لسماع الشهادة",
+    "aria": " الدعوى المستعجلة لسماع الشهادة",
+    "href": "#content-card-uJLVl7DwHwP6niq7p3n5tg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية والثمانون",
+    "aria": "",
+    "href": "#content-card-O9oEtraIpxhhb3c1Mi8m7w",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الخامس أحكام ختامية في الشهادة",
+    "aria": "أحكام ختامية في الشهادة",
+    "href": "#content-card-ecklZ4g15ySO-1A0_xCkqA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية والثمانون",
+    "aria": "",
+    "href": "#content-card-l6Bb08sZEs_Doa5szhYVOw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة والثمانون",
+    "aria": "",
+    "href": "#content-card-K38Y9xd1H953v6qtiGDDTw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب السادس  القرائن وحجية الأمر المقضي",
+    "aria": " القرائن وحجية الأمر المقضي",
+    "href": "#content-card-Kh3_KBHKMwitM23gpVZRMQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الأول  القرائن",
+    "aria": "القرائن",
+    "href": "#content-card-9-8eiDtRM1bda1Fk7coOsA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة والثمانون",
+    "aria": "",
+    "href": "#content-card-Fivf4d38Tp4jxGpbOMEGFA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة والثمانون",
+    "aria": "",
+    "href": "#content-card-KeEtsh3YfoaqWh95kN4XWw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الثاني حجية الأمر المقضي",
+    "aria": "حجية الأمر المقضي",
+    "href": "#content-card-r0uHIuKNcLdUo1eOPtb85A",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة والثمانون",
+    "aria": "",
+    "href": "#content-card-FYusicJh-VjL3gm_Uzy1Fg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة والثمانون",
+    "aria": "",
+    "href": "#content-card-HofPRHuRDiN8ih8eLm_ZDQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب السابع العرف",
+    "aria": "العرف",
+    "href": "#content-card-TLJyY-kBFnhLlw6k58gkCQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة والثمانون",
+    "aria": "",
+    "href": "#content-card-x_TVQDPhTQI2omGJS13UIw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة والثمانون",
+    "aria": "",
+    "href": "#content-card-R7zK0ODn8T7UAIZbiPvMVw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التسعون",
+    "aria": "",
+    "href": "#content-card-LdaqKRw2FVIJji44XDVACg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية والتسعون",
+    "aria": "",
+    "href": "#content-card-f3LrjsHaQpmozTtbFc1XUg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب الثامن اليمين",
+    "aria": "اليمين",
+    "href": "#content-card-dR6jIEd7LDCuDcwQsZm_Qw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الأول أحكام عامة",
+    "aria": "أحكام عامة",
+    "href": "#content-card-xex3NpX_NIBwsbDlz6rkqA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية والتسعون",
+    "aria": "",
+    "href": "#content-card-cU_RO8hrqAPEcSO3d4qY_w",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة والتسعون",
+    "aria": "",
+    "href": "#content-card-nxJCXc7WhoYSRKd30BXMUA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة والتسعون",
+    "aria": "",
+    "href": "#content-card-_8Ri7ii3fJvHCa1eVtepgA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة والتسعون",
+    "aria": "",
+    "href": "#content-card-Wl-QyF_i-ylJHmUDiquhLg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الثاني اليمين الحاسمة",
+    "aria": "اليمين الحاسمة",
+    "href": "#content-card-bgHBp8VQFsBo78laNAfiVg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة والتسعون",
+    "aria": "",
+    "href": "#content-card-lcwvyG9LLGVQfU-i3FATPA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة والتسعون",
+    "aria": "",
+    "href": "#content-card-eCBO2uu0TIPhHr-WWQOvng",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة والتسعون",
+    "aria": "",
+    "href": "#content-card-mIhHfhfhNbzfFx5odC_9Yw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة والتسعون",
+    "aria": "",
+    "href": "#content-card-JEP9gO-iqwzjEhniVH1E5w",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة المائة",
+    "aria": "",
+    "href": "#content-card-eTMuc5ZtEFh-f8hSh04ikg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الأولى بعد المائة",
+    "aria": "",
+    "href": "#content-card-ldzVwk6DoZNv7BwokcH_BA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية بعد المائة",
+    "aria": "",
+    "href": "#content-card-44DeJmQsmmoByluDaryR-g",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة بعد المائة",
+    "aria": "",
+    "href": "#content-card-Li6X_S2QVIMWs-YPMxoqnQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة بعد المائة",
+    "aria": "",
+    "href": "#content-card-RaJat24dHNnogUnkEJqZxw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الفصل الثالث اليمين المتممة",
+    "aria": "اليمين المتممة",
+    "href": "#content-card-2BlEnk6vbGZc0FQF6hXnFQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة بعد المائة",
+    "aria": "",
+    "href": "#content-card-TIS9gSjMB-OM5gzOGPU9yQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة بعد المائة",
+    "aria": "",
+    "href": "#content-card-fLhfQDxRZli63PwJnmG0vw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة بعد المائة",
+    "aria": "",
+    "href": "#content-card-8N7fM40yPN72ICXyHqT2lw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب التاسع المعاينة",
+    "aria": "المعاينة",
+    "href": "#content-card-M1GL14LV5xMjudjaAayUng",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة بعد المائة",
+    "aria": "",
+    "href": "#content-card-SLkYKx3GT0gdWRCxucDvqQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة بعد المائة",
+    "aria": "",
+    "href": "#content-card-IT5OitczJVIIlnHhUBZx_w",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب العاشر الخبرة",
+    "aria": "الخبرة",
+    "href": "#content-card-wNrq5mYW8TDiGSgC_x7hlA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة العاشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-LkXURLbInPj6Ljnp8NaBUw",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية عشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-p0fLg69SU-n_Z5C4kjljig",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية عشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-k0XfRNVRl9Xr-UDMDsCmYA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة عشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-FqrtSih5k_eHcbxa7plbUg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة عشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-LkUzkdSILHfs1swA6THRzA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة عشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-B6eCWGSdl2Zp39PeUq8aHg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة عشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-zjXvdUhFhD3M2SspGCxZyg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة عشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-AAenCTCWKDSgZbP7PrNcJA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة عشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-Uy0IwxsnvB9zNa98zYNjUA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة عشرة بعد المائة",
+    "aria": "",
+    "href": "#content-card-Qmos0TZrWbQtd7buRxZfOQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة العشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-mM4BFDyus2KZhWNJWjdwfA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الحادية والعشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-msk5TM0DwZFE-cPK17yISQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثانية والعشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-3roXLaVR5ufBnChEQv1fSA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثالثة والعشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-MCphhoeZr6HUIhPOQvfR7A",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الرابعة والعشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-trmg7PRuxFV87sw1JV_qZA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "الباب الحادي عشر  أحكام ختامية",
+    "aria": "أحكام ختامية",
+    "href": "#content-card--7vnlJP-M0nahQyAQrwo1g",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الخامسة والعشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-boyVJ5EKuy2NGl87UBMVAA",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السادسة والعشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-wHpKNf-0vm4XLtMC9qqQBQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة السابعة والعشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-bWxBPWvE640nC6STji_MCg",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة الثامنة والعشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-k9FwRK35IgZ6arUv495zbQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "المادة التاسعة والعشرون بعد المائة",
+    "aria": "",
+    "href": "#content-card-jw0Y6KAC_zRCsxHB7IAfWQ",
+    "cls": "nav-link navSelectItem"
+  },
+  {
+    "tag": "A",
+    "text": "من نحن",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/AboutUs.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "استراتيجية امن المعلومات",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/informationSecurityStrategy.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "الأخبار",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/MediaCenter/News/Pages/default.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "الاشتراك في النشرة البريدية",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/Newsletters.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "اتفاقية مستوى الخدمة",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/sla.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "سهولة الوصول",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/Accessibility.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "اتصل بنا",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/ContactUs.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "المشاركة المجتمعية الإلكترونية",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/eParticipation/Pages/default.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "تقديم شكوى",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/NajizInquiries.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "بلاغ عن فساد",
+    "aria": "",
+    "href": "https://my.gov.sa/ar/content/report-corruption#section-1",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "سياسة حق الحصول على المعلومة",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/Info-Rights.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "الأسئلة الشائعة",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/FAQ.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "المجلس الأعلى للقضاء",
+    "aria": "",
+    "href": "https://www.scj.gov.sa/",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "المنصة الوطنية",
+    "aria": "",
+    "href": "https://my.gov.sa/ar",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "البوابة الوطنية للبيانات المفتوحة",
+    "aria": "",
+    "href": "https://od.data.gov.sa/ar/home",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "منصة المشاركة المجتمعية ( تفاعل )",
+    "aria": "",
+    "href": "https://eparticipation.my.gov.sa/",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "منصة الاستشارات القانونية ( استطلاع )",
+    "aria": "",
+    "href": "https://istitlaa.ncc.gov.sa/ar/Pages/default.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "https://www.snapchat.com/add/mojksa",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "https://www.facebook.com/SaudiMoj/",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "https://www.instagram.com/mojksa/",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "https://www.youtube.com/user/ksamoj",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "https://twitter.com/mojksa",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "الدعم الفني بلغة الإشارة",
+    "aria": "",
+    "href": "https://new.najiz.sa/applications/video-chat",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "المحادثة الفورية",
+    "aria": "",
+    "href": "https://najiz.sa/applications/landing",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "https://play.google.com/store/apps/details?id=com.moj.najiz",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "https://apps.apple.com/ca/app/najiz-%D9%86%D8%A7%D8%AC%D8%B2/id1524792474",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "سياسة الخصوصية",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/PrivacyPolicy.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "شروط الاستخدام",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Ministry/Pages/TermsOfUse.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "خريطة الموقع",
+    "aria": "",
+    "href": "https://www.moj.gov.sa/ar/Pages/SiteMap.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "rc@moj.gov.sa",
+    "aria": "",
+    "href": "mailto:rc@moj.gov.sa?subject=Your%20Subject%20Here&body=Your%20message%20here...",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "http://jigsaw.w3.org/css-validator/validator?uri=https://www.moj.gov.sa/ar/pages/default.aspx",
+    "cls": ""
+  },
+  {
+    "tag": "A",
+    "text": "",
+    "aria": "",
+    "href": "https://raqmi.dga.gov.sa/platforms/platforms/98887777-b59d-443c-ab16-8222cf955bb5/platform-license",
+    "cls": ""
+  }
+]

@@ -1,22 +1,165 @@
 [
-  {"id": 1, "query": "أحكام المحكمة التجارية في فسخ عقود التوريد للإخلال الجوهري", "expected_top10": ["5f3f554c-2a8b-564a-84f8-b6666339dfe6", "bc4a09f2-5296-5747-996e-a2185293a7fc"], "notes": "Civil Transactions Law (rescission) + Commercial Courts Law"},
-  {"id": 2, "query": "متطلبات نظام مكافحة غسل الأموال لدى البنوك بالمملكة", "expected_top10": ["a48e44dd-5b08-5ba2-8773-1213c07b4e12"], "notes": "AML Law"},
-  {"id": 3, "query": "المرسوم الملكي الخاص بنظام المعاملات المدنية", "expected_top10": ["5f3f554c-2a8b-564a-84f8-b6666339dfe6"], "notes": "Civil Transactions Law"},
-  {"id": 4, "query": "شروط إنهاء عقد العمل من قبل صاحب العمل وفق نظام العمل", "expected_top10": ["f4a2681c-7aa6-5cda-af08-523d28686276"], "notes": "Labor Law"},
-  {"id": 5, "query": "المسؤولية التقصيرية في نظام المعاملات المدنية", "expected_top10": ["5f3f554c-2a8b-564a-84f8-b6666339dfe6"], "notes": "Civil Transactions Law - tort"},
-  {"id": 6, "query": "إنشاء المحاكم التجارية واختصاصها", "expected_top10": ["bc4a09f2-5296-5747-996e-a2185293a7fc"], "notes": "Commercial Courts Law"},
-  {"id": 7, "query": "إجراءات الاستئناف على حكم تجاري ابتدائي", "expected_top10": ["bc4a09f2-5296-5747-996e-a2185293a7fc"], "notes": "Commercial Courts Law - appeals"},
-  {"id": 8, "query": "حوكمة الشركات وحقوق المساهمين", "expected_top10": ["f6f3421b-34bd-57b4-99e7-75e1ffac1296"], "notes": "Companies Law"},
-  {"id": 9, "query": "تأسيس شركة ذات مسؤولية محدودة في النظام السعودي", "expected_top10": ["f6f3421b-34bd-57b4-99e7-75e1ffac1296"], "notes": "Companies Law"},
-  {"id": 10, "query": "عقوبات الإخلال بنظام حماية البيانات الشخصية", "expected_top10": ["38b07687-e4a7-5be9-9b78-5f7368dd6743"], "notes": "PDPL"},
-  {"id": 11, "query": "حقوق صاحب البيانات الشخصية وحقه في الاطلاع", "expected_top10": ["38b07687-e4a7-5be9-9b78-5f7368dd6743"], "notes": "PDPL - subject rights"},
-  {"id": 12, "query": "العناية الواجبة والإبلاغ عن العمليات المشبوهة", "expected_top10": ["a48e44dd-5b08-5ba2-8773-1213c07b4e12"], "notes": "AML"},
-  {"id": 13, "query": "أجور العمل والمكافآت في نظام العمل السعودي", "expected_top10": ["f4a2681c-7aa6-5cda-af08-523d28686276"], "notes": "Labor Law - wages"},
-  {"id": 14, "query": "الإخلال بالالتزامات التعاقدية وأثر الفسخ", "expected_top10": ["5f3f554c-2a8b-564a-84f8-b6666339dfe6"], "notes": "Civil Transactions - breach"},
-  {"id": 15, "query": "اندماج الشركات وتحويلها", "expected_top10": ["f6f3421b-34bd-57b4-99e7-75e1ffac1296"], "notes": "Companies - M&A"},
-  {"id": 16, "query": "personal data protection penalties Saudi Arabia", "expected_top10": ["38b07687-e4a7-5be9-9b78-5f7368dd6743"], "notes": "PDPL - English cross-lingual"},
-  {"id": 17, "query": "anti money laundering Saudi Arabia banks", "expected_top10": ["a48e44dd-5b08-5ba2-8773-1213c07b4e12"], "notes": "AML - English cross-lingual"},
-  {"id": 18, "query": "نقل البيانات الشخصية خارج المملكة", "expected_top10": ["38b07687-e4a7-5be9-9b78-5f7368dd6743"], "notes": "PDPL - cross-border transfer"},
-  {"id": 19, "query": "السجل التجاري والإفصاح في الشركات المساهمة", "expected_top10": ["f6f3421b-34bd-57b4-99e7-75e1ffac1296"], "notes": "Companies Law - disclosure"},
-  {"id": 20, "query": "إجازات العامل والإجازة السنوية", "expected_top10": ["f4a2681c-7aa6-5cda-af08-523d28686276"], "notes": "Labor Law - leave"}
+  {
+    "id": 1,
+    "query": "ما اختصاصات المحاكم التجارية؟",
+    "expected_top10": [
+      "a4b60a42-a91a-485d-8de1-eac0692dbf25"
+    ],
+    "notes": "Commercial Courts Law — court jurisdiction"
+  },
+  {
+    "id": 2,
+    "query": "إجراءات الاستئناف على حكم تجاري ابتدائي",
+    "expected_top10": [
+      "a4b60a42-a91a-485d-8de1-eac0692dbf25",
+      "494d5b0c-5765-4a99-b4aa-b3216910b567"
+    ],
+    "notes": "Commercial Courts Law and Appellate Procedure Implementing Regulations"
+  },
+  {
+    "id": 3,
+    "query": "أنواع الأدلة في نظام الإثبات السعودي",
+    "expected_top10": [
+      "867715eb-97ae-40a4-a550-ac665b6aacb7"
+    ],
+    "notes": "Evidence Law"
+  },
+  {
+    "id": 4,
+    "query": "حجية المحررات الإلكترونية كدليل في الإثبات",
+    "expected_top10": [
+      "867715eb-97ae-40a4-a550-ac665b6aacb7"
+    ],
+    "notes": "Evidence Law"
+  },
+  {
+    "id": 5,
+    "query": "تبليغ الخصوم عبر البريد الإلكتروني في المرافعات",
+    "expected_top10": [
+      "a4b60a42-a91a-485d-8de1-eac0692dbf25",
+      "d83eb559-bd5b-45e4-828d-d29d20d6fd9e"
+    ],
+    "notes": "Sharia Procedure Law and Commercial Courts Law"
+  },
+  {
+    "id": 6,
+    "query": "إجراءات استجواب الخصوم أمام المحكمة",
+    "expected_top10": [
+      "867715eb-97ae-40a4-a550-ac665b6aacb7"
+    ],
+    "notes": "Evidence Law"
+  },
+  {
+    "id": 7,
+    "query": "كيف يتم التسجيل العيني للعقار في المملكة؟",
+    "expected_top10": [
+      "95d22cd2-3429-41f1-9e59-3e51a24f0afa"
+    ],
+    "notes": "Real Estate Registration"
+  },
+  {
+    "id": 8,
+    "query": "إجراءات نزع ملكية العقارات للمنفعة العامة",
+    "expected_top10": [
+      "8e0a5878-af03-48e0-a87d-80f9c99b20a7"
+    ],
+    "notes": "Expropriation"
+  },
+  {
+    "id": 9,
+    "query": "حقوق الأحداث الجانحين في النظام السعودي",
+    "expected_top10": [
+      "e27546de-1bb7-49ac-8865-41b36dbf2f67"
+    ],
+    "notes": "Juveniles Law"
+  },
+  {
+    "id": 10,
+    "query": "عقوبة تمويل الإرهاب في النظام السعودي",
+    "expected_top10": [
+      "ec416ebd-c3fa-4679-b0e9-c2e90885c85a"
+    ],
+    "notes": "Counter-Terrorism"
+  },
+  {
+    "id": 11,
+    "query": "واجبات المحامي المهنية والأخلاقية",
+    "expected_top10": [
+      "fe316b28-981e-42a6-8b4c-e5aaa46d0a01"
+    ],
+    "notes": "Lawyer Code"
+  },
+  {
+    "id": 12,
+    "query": "متى يستحق المتهم محاميًا على نفقة الدولة؟",
+    "expected_top10": [
+      "3042f900-9b13-496c-aabd-1d7604567149"
+    ],
+    "notes": "Public Defender"
+  },
+  {
+    "id": 13,
+    "query": "إجراءات التنفيذ القضائي في النظام السعودي",
+    "expected_top10": [
+      "f9d20d8e-56d8-4cdd-8dd6-3419cb392777"
+    ],
+    "notes": "Enforcement Implementing"
+  },
+  {
+    "id": 14,
+    "query": "كيفية توثيق العقود لدى كاتب العدل",
+    "expected_top10": [
+      "b145ac43-cd65-4a6f-9337-450a755aeb48",
+      "3fbab521-3c31-4e16-9a49-77062fdeae63"
+    ],
+    "notes": "Notarization Law and Notarization Implementing"
+  },
+  {
+    "id": 15,
+    "query": "أحكام الرهن العقاري المسجل",
+    "expected_top10": [
+      "9f83a3fb-0812-4cbb-9aad-cba7e5069ed3"
+    ],
+    "notes": "Real Estate Mortgage"
+  },
+  {
+    "id": 16,
+    "query": "قسمة الأموال المشتركة بين الورثة والشركاء",
+    "expected_top10": [
+      "afbd17a7-af5b-4382-add5-f366b56ad4ae"
+    ],
+    "notes": "Common Property Division"
+  },
+  {
+    "id": 17,
+    "query": "إجراءات صندوق النفقة وآلية الصرف",
+    "expected_top10": [
+      "60535d13-2523-400d-8882-053b1ce2dae1"
+    ],
+    "notes": "Maintenance Fund"
+  },
+  {
+    "id": 18,
+    "query": "ملكية الوحدات العقارية المشتركة وإدارتها",
+    "expected_top10": [
+      "0dff78ac-7ce5-4cc3-8d82-83f8fb59d9cc"
+    ],
+    "notes": "Condominium"
+  },
+  {
+    "id": 19,
+    "query": "Saudi commercial courts jurisdiction and appeal procedure",
+    "expected_top10": [
+      "a4b60a42-a91a-485d-8de1-eac0692dbf25"
+    ],
+    "notes": "Commercial Courts Law — English cross-lingual"
+  },
+  {
+    "id": 20,
+    "query": "evidence law electronic records Saudi Arabia",
+    "expected_top10": [
+      "867715eb-97ae-40a4-a550-ac665b6aacb7"
+    ],
+    "notes": "Evidence Law — English cross-lingual"
+  }
 ]

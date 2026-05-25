@@ -61,10 +61,17 @@ def evaluate_pair(item: dict, response: dict) -> tuple[bool, str]:
         return False, f"refused: {response.get('refusal_reason')}"
     answer = response.get("answer_ar", "") or ""
     citations = response.get("citations", []) or []
-    expected_doc = item["expected_doc_id"]
+    # Accept either a single canonical doc (expected_doc_id) or a set of
+    # acceptable docs (acceptable_doc_ids). The Saudi procedural-justice
+    # corpus has overlapping laws (Sharia Procedure ↔ Commercial Courts,
+    # Criminal Procedure ↔ Appellate Procedure ↔ Public Defender) where
+    # multiple sources can be faithful answers to one question.
+    acceptable = set(item.get("acceptable_doc_ids") or [])
+    if item.get("expected_doc_id"):
+        acceptable.add(item["expected_doc_id"])
     cited_docs = {c.get("doc_id") for c in citations}
-    if expected_doc not in cited_docs:
-        return False, f"no citation to expected doc; cited: {cited_docs}"
+    if not (acceptable & cited_docs):
+        return False, f"no citation to any acceptable doc {sorted(acceptable)}; cited: {cited_docs}"
     needles = item.get("must_mention_any", [])
     if needles and not any(n in answer for n in needles):
         return False, f"no must-mention term in answer (looked for {needles})"

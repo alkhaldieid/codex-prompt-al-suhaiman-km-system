@@ -52,6 +52,11 @@ class Document(Base):
     extracted_text: Mapped[str] = mapped_column(Text, default="")
     source_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     source_connector_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    source_external_id: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source_external_etag: Mapped[str | None] = mapped_column(Text, nullable=True)
+    source_updated_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     practice_area: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
     auto_tag_confidence: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     ocr_metadata: Mapped[dict | None] = mapped_column(JSON, nullable=True)

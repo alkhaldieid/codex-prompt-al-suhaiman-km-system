@@ -79,6 +79,12 @@ jobs:
             if curl -sf http://localhost:8000/api/v1/health > /dev/null; then break; fi
             sleep 2
           done
+      - name: Embed seeded chunks before evals
+        run: docker compose exec -T backend python /app/scripts/embed_unembedded_chunks.py
+      - name: Corpus integrity (PR-blocking)
+        env:
+          DATABASE_URL: postgresql://suhaiman:suhaiman@localhost:5432/suhaiman_km
+        run: pip install psycopg[binary] && python scripts/run_corpus_integrity.py
       - name: Smoke benchmark (5 queries)
         run: python scripts/run_ai_quality.py --mode smoke
 
@@ -111,6 +117,12 @@ jobs:
             if curl -sf http://localhost:8000/api/v1/health > /dev/null; then break; fi
             sleep 2
           done
+      - name: Embed seeded chunks before evals
+        run: docker compose exec -T backend python /app/scripts/embed_unembedded_chunks.py
+      - name: Corpus integrity
+        env:
+          DATABASE_URL: postgresql://suhaiman:suhaiman@localhost:5432/suhaiman_km
+        run: pip install psycopg[binary] && python scripts/run_corpus_integrity.py
       - name: Full retrieval benchmark (20 queries)
         run: python scripts/run_ai_quality.py --mode full
       - name: Faithfulness eval (20 Q/A pairs)
