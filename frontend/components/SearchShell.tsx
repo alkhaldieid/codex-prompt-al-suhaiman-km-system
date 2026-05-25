@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Loader2, Search, FileText, ExternalLink } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ChevronDown, ExternalLink, FileText, Loader2, Search } from "lucide-react";
 import { searchRegulations } from "@/lib/api";
 
 const PRACTICE_AREA_AR: Record<string, string> = {
@@ -57,6 +57,17 @@ type Result = {
   source_url: string | null;
 };
 
+type Grouped = {
+  doc_id: string;
+  title_ar: string;
+  doc_type: string;
+  practice_area: string[];
+  source_track: string;
+  source_url: string | null;
+  best: Result;           // best-scoring chunk
+  others: Result[];       // remaining chunks for the same doc, sorted by score
+};
+
 export function SearchShell() {
   const [q, setQ] = useState("");
   const [submitted, setSubmitted] = useState("");
@@ -67,9 +78,10 @@ export function SearchShell() {
   const [filterPractice, setFilterPractice] = useState<string | null>(null);
   const [filterDocType, setFilterDocType] = useState<string | null>(null);
   const [filterTrack, setFilterTrack] = useState<string | null>(null);
+  const [expandedDocId, setExpandedDocId] = useState<string | null>(null);
+  const [showScoresForId, setShowScoresForId] = useState<string | null>(null);
 
   useEffect(() => {
-    // Read q from query string on mount
     const params = new URLSearchParams(window.location.search);
     const initial = params.get("q") ?? "";
     if (initial) {
@@ -87,11 +99,12 @@ export function SearchShell() {
     setBusy(true);
     setError("");
     setSubmitted(query);
+    setExpandedDocId(null);
+    setShowScoresForId(null);
     try {
       const data = await searchRegulations(token, query);
       setResults((data.results ?? []) as Result[]);
       setTookMs(data.took_ms ?? null);
-      // Update URL without nav
       const params = new URLSearchParams(window.location.search);
       params.set("q", query);
       window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
@@ -109,7 +122,33 @@ export function SearchShell() {
     return true;
   });
 
-  // Compute available filter chips from current results
+  // Group by doc_id, sorting within each doc by score desc.
+  const grouped: Grouped[] = useMemo(() => {
+    const byDoc = new Map<string, Result[]>();
+    for (const r of filtered) {
+      const arr = byDoc.get(r.doc_id) ?? [];
+      arr.push(r);
+      byDoc.set(r.doc_id, arr);
+    }
+    const out: Grouped[] = [];
+    for (const [doc_id, rs] of byDoc) {
+      rs.sort((a, b) => b.score - a.score);
+      const [best, ...others] = rs;
+      out.push({
+        doc_id,
+        title_ar: best.title_ar,
+        doc_type: best.doc_type,
+        practice_area: best.practice_area,
+        source_track: best.source_track,
+        source_url: best.source_url,
+        best,
+        others,
+      });
+    }
+    out.sort((a, b) => b.best.score - a.best.score);
+    return out;
+  }, [filtered]);
+
   const availablePractice = Array.from(new Set(results.flatMap((r) => r.practice_area ?? [])));
   const availableDocType = Array.from(new Set(results.map((r) => r.doc_type)));
   const availableTrack = Array.from(new Set(results.map((r) => r.source_track)));
@@ -133,7 +172,7 @@ export function SearchShell() {
             type="text"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="ابحث في السوابق والآراء والأنظمة…"
+            placeholder="اكتب سؤالك أو ابحث عن نظام"
             className="flex-1 rounded-md border border-slate-300 bg-white px-4 py-3 font-textArabic text-lg leading-7 text-slate-900 outline-none focus:border-teal-600"
           />
           <button
@@ -150,56 +189,114 @@ export function SearchShell() {
 
         {submitted && !busy ? (
           <div className="mb-4 text-sm text-slate-600">
-            {filtered.length} نتيجة لـ <span className="font-semibold text-slate-800">{submitted}</span>
+            {grouped.length} مستند · {filtered.length} مقطع مطابق لـ{" "}
+            <span className="font-semibold text-slate-800">{submitted}</span>
             {tookMs !== null ? <> · زمن البحث {tookMs}ms</> : null}
           </div>
         ) : null}
 
         <div className="grid grid-cols-[1fr_280px] gap-6">
-          {/* Main results column */}
+          {/* Main results column — grouped per document */}
           <section>
-            {filtered.length === 0 && submitted && !busy ? (
+            {grouped.length === 0 && submitted && !busy ? (
               <div className="rounded-lg border border-slate-200 bg-white p-6 text-center text-slate-600">
                 لا توجد نتائج مطابقة. جرّب صياغة أخرى أو أزل الفلاتر.
               </div>
             ) : null}
             <ul className="space-y-3">
-              {filtered.map((r) => (
-                <li key={r.chunk_id} className="rounded-lg border border-slate-200 bg-white p-5 transition hover:border-teal-600">
-                  <div className="mb-2 flex items-center gap-2 text-xs text-slate-500">
-                    <span className="rounded bg-teal-50 px-2 py-0.5 font-semibold text-teal-800">
-                      {SOURCE_BADGE[r.source_track] ?? r.source_track}
-                    </span>
-                    <span className="rounded bg-slate-100 px-2 py-0.5">{DOC_TYPE_AR[r.doc_type] ?? r.doc_type}</span>
-                    {(r.practice_area ?? []).map((pa) => (
-                      <span key={pa} className="rounded bg-slate-100 px-2 py-0.5">{PRACTICE_AREA_AR[pa] ?? pa}</span>
-                    ))}
-                    <span className="ms-auto text-slate-400">¶{r.paragraph_no ?? "?"}</span>
-                  </div>
-                  <a href={`/documents/${r.doc_id}?chunk=${r.chunk_id}`} className="block text-lg font-bold text-slate-950 hover:text-accent-dark">
-                    <FileText className="me-2 inline h-5 w-5 align-middle text-slate-400" aria-hidden="true" />
-                    {r.title_ar}
-                  </a>
-                  <p
-                    className="mt-2 font-textArabic text-base leading-8 text-slate-700"
-                    dangerouslySetInnerHTML={{__html: r.snippet_ar.replace(/<em>/g, '<em class="bg-amber-100 not-italic font-semibold">')}}
-                  />
-                  <div className="mt-3 flex items-center gap-4 text-xs text-slate-500">
-                    <span>BM25: <span className="font-mono">{r.bm25_score.toFixed(2)}</span></span>
-                    <span>Vector: <span className="font-mono">{r.vector_score.toFixed(3)}</span></span>
-                    <span>Fused: <span className="font-mono">{r.score.toFixed(4)}</span></span>
-                    {r.source_url ? (
-                      <a href={r.source_url} target="_blank" rel="noopener noreferrer" className="ms-auto flex items-center gap-1 hover:text-teal-700">
-                        المصدر <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                      </a>
+              {grouped.map((g) => {
+                const isExpanded = expandedDocId === g.doc_id;
+                const isShowingScores = showScoresForId === g.doc_id;
+                return (
+                  <li key={g.doc_id} className="rounded-lg border border-slate-200 bg-white p-5 transition hover:border-teal-600">
+                    <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+                      <span className="rounded bg-teal-50 px-2 py-0.5 font-semibold text-teal-800">
+                        {SOURCE_BADGE[g.source_track] ?? g.source_track}
+                      </span>
+                      <span className="rounded bg-slate-100 px-2 py-0.5">{DOC_TYPE_AR[g.doc_type] ?? g.doc_type}</span>
+                      {(g.practice_area ?? []).map((pa) => (
+                        <span key={pa} className="rounded bg-slate-100 px-2 py-0.5">{PRACTICE_AREA_AR[pa] ?? pa}</span>
+                      ))}
+                      <span className="ms-auto text-slate-400">¶{g.best.paragraph_no ?? "?"}</span>
+                    </div>
+
+                    <a
+                      href={`/documents/${g.doc_id}?chunk=${g.best.chunk_id}`}
+                      className="block text-lg font-bold text-slate-950 hover:text-accent-dark"
+                    >
+                      <FileText className="me-2 inline h-5 w-5 align-middle text-slate-400" aria-hidden="true" />
+                      {g.title_ar}
+                    </a>
+
+                    <p
+                      className="mt-2 font-textArabic text-base leading-8 text-slate-700"
+                      dangerouslySetInnerHTML={{__html: g.best.snippet_ar.replace(/<em>/g, '<em class="bg-amber-100 not-italic font-semibold">')}}
+                    />
+
+                    <div className="mt-3 flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                      {g.others.length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => setExpandedDocId(isExpanded ? null : g.doc_id)}
+                          className="inline-flex items-center gap-1 font-semibold text-slate-700 hover:text-accent-dark"
+                        >
+                          <ChevronDown className={`h-4 w-4 transition ${isExpanded ? "rotate-180" : ""}`} aria-hidden="true" />
+                          {g.others.length + 1} مقطع مطابق
+                        </button>
+                      ) : (
+                        <span>مقطع واحد مطابق</span>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => setShowScoresForId(isShowingScores ? null : g.doc_id)}
+                        className="inline-flex items-center gap-1 text-slate-500 hover:text-slate-700"
+                      >
+                        <ChevronDown className={`h-3.5 w-3.5 transition ${isShowingScores ? "rotate-180" : ""}`} aria-hidden="true" />
+                        تفاصيل الترتيب
+                      </button>
+
+                      {g.source_url ? (
+                        <a href={g.source_url} target="_blank" rel="noopener noreferrer" className="ms-auto flex items-center gap-1 hover:text-teal-700">
+                          المصدر <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                        </a>
+                      ) : null}
+                    </div>
+
+                    {isShowingScores ? (
+                      <div className="mt-3 grid grid-cols-3 gap-2 rounded-md bg-slate-50 p-3 text-xs text-slate-600">
+                        <div>BM25: <span className="font-mono">{g.best.bm25_score.toFixed(2)}</span></div>
+                        <div>Vector: <span className="font-mono">{g.best.vector_score.toFixed(3)}</span></div>
+                        <div>Fused: <span className="font-mono">{g.best.score.toFixed(4)}</span></div>
+                      </div>
                     ) : null}
-                  </div>
-                </li>
-              ))}
+
+                    {isExpanded && g.others.length > 0 ? (
+                      <ul className="mt-4 space-y-2 border-t border-slate-200 pt-4">
+                        {g.others.map((o) => (
+                          <li key={o.chunk_id} className="rounded bg-slate-50 p-3">
+                            <div className="mb-1 text-xs text-slate-500">¶{o.paragraph_no ?? "?"}</div>
+                            <p
+                              className="font-textArabic text-sm leading-7 text-slate-700"
+                              dangerouslySetInnerHTML={{__html: o.snippet_ar.replace(/<em>/g, '<em class="bg-amber-100 not-italic font-semibold">')}}
+                            />
+                            <a
+                              href={`/documents/${g.doc_id}?chunk=${o.chunk_id}`}
+                              className="mt-1 inline-block text-xs font-semibold text-accent-dark hover:underline"
+                            >
+                              افتح هذا المقطع ←
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
-          {/* Filters rail (visually-left in RTL flow) */}
+          {/* Filters rail */}
           <aside className="space-y-4">
             <FilterCard title="نوع المستند" items={availableDocType} labels={DOC_TYPE_AR} value={filterDocType} onChange={setFilterDocType} />
             <FilterCard title="مجال الممارسة" items={availablePractice} labels={PRACTICE_AREA_AR} value={filterPractice} onChange={setFilterPractice} />

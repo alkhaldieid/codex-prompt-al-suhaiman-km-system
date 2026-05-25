@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, MessageSquare, FileText, ExternalLink } from "lucide-react";
 import { askDocument, getDocument } from "@/lib/api";
+import { Citation, renderAnswerWithCitationChips } from "@/lib/citations";
 
 const DOC_TYPE_AR: Record<string, string> = {
   judicial_ruling: "حكم قضائي",
@@ -29,14 +30,6 @@ type DocDetail = {
   chunk_count: number;
   extracted_text_preview: string;
   source_url: string | null;
-};
-
-type Citation = {
-  marker: string;
-  doc_id: string;
-  chunk_id: string;
-  paragraph_no: number | null;
-  quoted_text_ar: string;
 };
 
 type AskTurn = {
@@ -94,15 +87,36 @@ export function DocumentShell({docId}: Props) {
   }
 
   async function submitQuestion() {
+    await submitQuestionImmediate(question);
+  }
+
+  // Auto-submit any ?q= passed in the URL (e.g. from the UploadShell
+  // success block). Runs once when the doc loads.
+  useEffect(() => {
+    if (!doc) return;
+    const params = new URLSearchParams(window.location.search);
+    const initialQ = params.get("q");
+    if (initialQ && !asking && turns.length === 0) {
+      setQuestion(initialQ);
+      void submitQuestionImmediate(initialQ);
+      // Remove the param so a manual reload doesn't re-fire.
+      params.delete("q");
+      const qs = params.toString();
+      window.history.replaceState(null, "", window.location.pathname + (qs ? "?" + qs : ""));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [doc]);
+
+  async function submitQuestionImmediate(q: string) {
     const token = window.localStorage.getItem("suhaiman_access_token");
-    if (!token || !question.trim()) return;
+    if (!token || !q.trim()) return;
     setAsking(true);
     try {
-      const data = await askDocument(token, docId, question.trim());
+      const data = await askDocument(token, docId, q.trim());
       setTurns((prev) => [
         ...prev,
         {
-          question: question.trim(),
+          question: q.trim(),
           answer: data.answer_ar ?? "",
           citations: data.citations ?? [],
           took_ms: data.took_ms ?? null,
@@ -116,39 +130,6 @@ export function DocumentShell({docId}: Props) {
     } finally {
       setAsking(false);
     }
-  }
-
-  function renderAnswerWithCitationLinks(answer: string, citations: Citation[]) {
-    if (!answer) return null;
-    // Replace [¶N] markers (Arabic or western digits) with clickable spans.
-    const parts: (string | {marker: string; n: number})[] = [];
-    const re = /\[¶([0-9٠-٩]+)\]/g;
-    let last = 0;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(answer)) !== null) {
-      if (m.index > last) parts.push(answer.slice(last, m.index));
-      const digits = m[1].replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
-      const n = parseInt(digits, 10);
-      parts.push({marker: m[0], n});
-      last = re.lastIndex;
-    }
-    if (last < answer.length) parts.push(answer.slice(last));
-
-    return parts.map((p, i) => {
-      if (typeof p === "string") return <span key={i}>{p}</span>;
-      const cited = citations.find((c) => c.paragraph_no === p.n);
-      return (
-        <button
-          key={i}
-          type="button"
-          className="mx-1 rounded bg-teal-100 px-1 py-0.5 text-xs font-semibold text-teal-900 hover:bg-teal-200"
-          onClick={() => scrollToParagraph(p.n)}
-          title={cited?.quoted_text_ar ?? ""}
-        >
-          {p.marker}
-        </button>
-      );
-    });
   }
 
   if (error) {
@@ -251,7 +232,11 @@ export function DocumentShell({docId}: Props) {
                     {t.refused ? (
                       <span className="text-amber-800">{t.answer}</span>
                     ) : (
-                      renderAnswerWithCitationLinks(t.answer, t.citations)
+                      renderAnswerWithCitationChips(
+                        t.answer,
+                        t.citations,
+                        (n) => scrollToParagraph(n),
+                      )
                     )}
                   </div>
                   {t.citations.length > 0 ? (

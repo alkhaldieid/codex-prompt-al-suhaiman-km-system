@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CheckCircle2, FileText, FileUp, Loader2, ShieldAlert } from "lucide-react";
+import { CheckCircle2, FileText, FileUp, Loader2, MessageSquare, ShieldAlert } from "lucide-react";
 import { ConfidenceDot } from "@/components/ConfidenceDot";
 import { confirmDocument, getDocument, getDocumentStatus, uploadDocument } from "@/lib/api";
+
+const DEFAULT_FOLLOWUP_QUESTION = "ما أبرز ما ورد في هذا المستند؟";
 
 const stages = ["جاري الرفع…", "قراءة المستند ضوئياً…", "استخلاص البيانات…", "الفهرسة…"];
 
@@ -63,6 +65,7 @@ export function UploadShell() {
   const [doc, setDoc] = useState<DocDetail | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [confirmToast, setConfirmToast] = useState("");
+  const [followupQuestion, setFollowupQuestion] = useState(DEFAULT_FOLLOWUP_QUESTION);
 
   const selectedFileLabel = useMemo(() => {
     if (!file) return "لم يتم اختيار ملف";
@@ -192,7 +195,7 @@ export function UploadShell() {
           ) : null}
 
           {/* §8.2.4 Confirmation screen — auto-tagged fields, confidence dots,
-              one-click تأكيد وفهرسة promotion to published. */}
+              one-click "حفظ ونشر" promotion to published. */}
           {doc && doc.status === "pending_review" ? (
             <section className="mt-6 rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
               <h2 className="mb-4 text-xl font-bold text-slate-950">تأكيد بيانات المستند</h2>
@@ -246,7 +249,7 @@ export function UploadShell() {
                   disabled={confirming}
                   className="rounded-md bg-accent px-5 py-3 font-semibold text-white hover:bg-accent-dark disabled:opacity-60"
                 >
-                  {confirming ? "جاري التأكيد…" : "تأكيد وفهرسة"}
+                  {confirming ? "جاري التأكيد…" : "حفظ ونشر"}
                 </button>
                 <a href={`/documents/${doc.doc_id}`} className="rounded-md border border-slate-300 px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50">
                   حفظ كمسودة
@@ -255,18 +258,41 @@ export function UploadShell() {
             </section>
           ) : null}
 
-          {confirmToast ? (
-            <div role="status" className="mt-4 rounded-lg bg-emerald-50 p-4 text-emerald-900">
-              <div className="flex items-center gap-2 font-semibold">
+          {/* Post-publish moment of magic: pre-filled question, one click
+              takes them to the doc viewer with auto-submitted Q&A. */}
+          {confirmToast && doc ? (
+            <section role="status" className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-5 text-emerald-950">
+              <div className="flex items-center gap-2 text-lg font-bold">
                 <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
-                {confirmToast}
+                تم الحفظ والفهرسة ✓
               </div>
-              <div className="mt-2 text-sm">
-                <a href={`/documents/${doc?.doc_id}`} className="underline hover:no-underline">فتح المستند</a>
-                {" • "}
-                <a href="/search" className="underline hover:no-underline">انتقل إلى البحث</a>
+              <p className="mt-1 text-sm">المستند الآن قابل للبحث والسؤال.</p>
+
+              <div className="mt-4 rounded-md border border-emerald-200 bg-white p-3">
+                <label className="block text-xs font-semibold text-slate-600">جرّب سؤالاً عن المستند:</label>
+                <input
+                  type="text"
+                  value={followupQuestion}
+                  onChange={(e) => setFollowupQuestion(e.target.value)}
+                  className="mt-1 w-full rounded border border-slate-200 bg-white px-2 py-1.5 font-textArabic text-base leading-7 text-slate-900 outline-none focus:border-teal-600"
+                />
               </div>
-            </div>
+              <div className="mt-3 flex flex-wrap gap-3">
+                <a
+                  href={`/documents/${doc.doc_id}?q=${encodeURIComponent(followupQuestion.trim() || DEFAULT_FOLLOWUP_QUESTION)}`}
+                  className="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-2.5 font-semibold text-white hover:bg-accent-dark"
+                >
+                  <MessageSquare className="h-5 w-5" aria-hidden="true" />
+                  اسأل عن المستند
+                </a>
+                <a href={`/documents/${doc.doc_id}`} className="rounded-md border border-emerald-300 px-5 py-2.5 font-semibold text-emerald-900 hover:bg-emerald-100">
+                  افتح المستند
+                </a>
+                <a href="/search" className="rounded-md border border-emerald-300 px-5 py-2.5 font-semibold text-emerald-900 hover:bg-emerald-100">
+                  انتقل إلى البحث
+                </a>
+              </div>
+            </section>
           ) : null}
 
           {doc?.extracted_text_preview ? (

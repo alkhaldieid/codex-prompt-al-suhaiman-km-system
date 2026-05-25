@@ -146,6 +146,7 @@ def _parse_citations(answer: str, kept: list[RetrievedChunk]) -> list[dict]:
                 "marker": f"¶{n}",
                 "doc_id": str(chunk.doc.doc_id),
                 "title_ar": chunk.doc.title_ar,
+                "doc_type": chunk.doc.doc_type,
                 "chunk_id": str(chunk.chunk.chunk_id),
                 "paragraph_no": chunk.chunk.paragraph_no,
                 "page_no": chunk.chunk.page_no,

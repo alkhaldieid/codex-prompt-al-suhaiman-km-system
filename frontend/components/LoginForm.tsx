@@ -29,7 +29,7 @@ export function LoginForm() {
     <form onSubmit={onSubmit} className="w-full max-w-[400px] rounded-lg border border-slate-200 bg-white p-8 shadow-sm">
       <div className="mb-8 text-center">
         <div className="text-3xl font-bold text-slate-950">السحيمان</div>
-        <p className="mt-2 text-sm text-slate-600">نظام إدارة المعرفة القانونية</p>
+        <p className="mt-2 text-sm text-slate-600">مكتبة الأنظمة والسوابق</p>
       </div>
 
       <label className="mb-2 block text-sm font-medium text-slate-800" htmlFor="email">
